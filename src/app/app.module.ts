@@ -10,12 +10,18 @@ import { IBeacon } from '@ionic-native/ibeacon';
 import { NextPage } from '../pages/next/next';
 import { BeaconProvider } from '../services/beacon-provider';
 import { LocalNotifications } from '@ionic-native/local-notifications';
+import { YellowPage } from '../pages/yellow/yellow';
+import { PinkPage } from '../pages/pink/pink';
+import { WhitePage } from '../pages/white/white';
 
 @NgModule({
   declarations: [
     MyApp,
     HomePage,
-    NextPage
+    NextPage,
+    YellowPage,
+    PinkPage,
+    WhitePage
   ],
   imports: [
     BrowserModule,
@@ -25,7 +31,10 @@ import { LocalNotifications } from '@ionic-native/local-notifications';
   entryComponents: [
     MyApp,
     HomePage,
-    NextPage
+    NextPage,
+    YellowPage,
+    PinkPage,
+    WhitePage
   ],
   providers: [
     StatusBar,

@@ -5,6 +5,9 @@ import { NextPage } from '../next/next';
 import { BeaconProvider } from '../../services/beacon-provider';
 import { LocalNotifications } from '@ionic-native/local-notifications';
 import { AlertController } from 'ionic-angular';
+import { WhitePage } from '../white/white';
+import { PinkPage } from '../pink/pink';
+import { YellowPage } from '../yellow/yellow';
 
 
 @Component({
@@ -17,7 +20,7 @@ export class HomePage implements OnDestroy {
   nxtPage = NextPage;
   beacons = [];
   zone:any ;
-  location: String = '';
+  location: string = '';
 
   constructor(public alertCtrl: AlertController, public navCtrl: NavController, public platform: Platform,  
       public localNotifications: LocalNotifications,
@@ -58,38 +61,55 @@ export class HomePage implements OnDestroy {
           });
         }); 
       });
-      this.events.subscribe('didRangeBeaconsInRegion', (data) => {
+      this.events.subscribe('didExitRegion', (data) => {
+        this.zone.run(()=> {
+          console.log('Exited!');
+          this.localNotifications.schedule({
+            id: 2,
+            title:'SmartCafe',
+            text: 'Thanks for visiting us, hope to see you again soon!',
+            trigger: {at: new Date(new Date().getTime())}
+          });
+        });
+      });
+      this.events.subscribe('didRangeBeaconsInRegion', (beacon) => {
         console.log('Inside Subscription');     
         this.zone.run(() => {
           console.log('INSIDE RUN');    
           // // update the UI with the beacon list
-          let beaconList = data.beacons;
-          beaconList.forEach((beacon) => {
-              this.beacons.push(beacon);
-          });   
-          console.log(this.beacons);          
-         this.beacons.forEach((beacon)=> {
-           if(beacon.proximity == 'ProximityImmediate') {
+          // let beaconList = data.beacons;
+          // beaconList.forEach((beacon) => {
+          //     this.beacons.push(beacon);
+          // });   
+          console.log("Beacon collected: " + JSON.stringify(beacon));          
+        //  this.beacons.forEach((beacon)=> {
+          //  if(beacon.proximity == 'ProximityImmediate') {
              switch(beacon.minor) {
-               case '38872': this.location = 'Bed';
+               case '38872': 
+              //  this.location = 'This is the back of the shop!';
+               this.navCtrl.push(WhitePage);
                break;
-               case '16549': this.location = 'Iron';
+               case '16549': 
+              //  this.location = 'You are near the counter from where you can order!';
+               this.navCtrl.push(PinkPage);
                break;
-               case '45700': this.location = 'Store Room';
+               case '45700': 
+              //  this.location = 'This is one of our PS4 tables, you can connect and play! for 10 AED/hr!';
+               this.navCtrl.push(YellowPage);
                break;
                default: this.location = 'Nowhere Found!';
              }          
-           }
+          //  }
            console.log('Location now is : ' + this.location);
            console.log('Just before craeeting alert');
           
-         });   
-         const alert = this.alertCtrl.create({
-          title: 'New Friend!',
-          subTitle: 'You are in the ' + this.location + ' area',
-          buttons: ['OK']
-        });
-        alert.present();     
+        //  });   
+        //  const alert = this.alertCtrl.create({
+        //   title: 'Hello there!',
+        //   subTitle: this.location,
+        //   buttons: ['OK']
+        // });
+        // alert.present();     
         
        }); 
     });

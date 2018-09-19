@@ -37,11 +37,17 @@ this.delegate = this.ibeacon.Delegate();
 this.delegate.didRangeBeaconsInRegion().subscribe(
 data => {
     if(data.beacons.length > 0){
-        console.log('Got data Ranging Beacons Publishing this data! -> ' + JSON.stringify(data));
-        this.events.publish('didRangeBeaconsInRegion', data);
-        this.ibeacon.stopRangingBeaconsInRegion(this.region).then(()=> {
-            console.log('Stopped Ranging Beacons Now!');
-         });
+        data.beacons.forEach((beacon)=>{
+            if(beacon.proximity == 'ProximityImmediate') {
+                console.log('Got data Ranging Beacons Publishing this data! -> ' + JSON.stringify(beacon));
+                
+                this.ibeacon.stopRangingBeaconsInRegion(this.region).then(()=> {
+                    console.log('Stopped Ranging Beacons Now!');
+                    this.events.publish('didRangeBeaconsInRegion', beacon);
+                 });
+            }
+        })
+       
     }    
 // this.ibeacon.stopRangingBeaconsInRegion(this.region);
 // this.ibeacon.stopMonitoringForRegion(this.region);
@@ -53,6 +59,13 @@ this.delegate.didEnterRegion().subscribe(
     data => {
         console.log('FOUND REGION, Publishing data');
         this.events.publish('didEnterRegion',data);
+    }
+)
+
+this.delegate.didExitRegion().subscribe(
+    data => {
+        console.log('EXITED REGION, Publishing data');
+        this.events.publish('didExitRegion',data);
     }
 )
 
@@ -75,7 +88,7 @@ this.delegate.didDetermineStateForRegion().subscribe(
                     },
                     error => {
                         console.error('Failed to begin monitoring: ', error);
-                        // resolve(false);
+                        resolve(false);
                     }
                 );
         }
