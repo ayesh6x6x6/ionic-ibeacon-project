@@ -1,18 +1,22 @@
-<!--
-  Generated template for the WhitePage page.
-
-  See http://ionicframework.com/docs/components/#navigation for more info on
-  Ionic pages and navigation.
--->
 <ion-header>
 
   <ion-navbar>
-    <ion-title>white</ion-title>
+    <ion-title>Quiet Zone</ion-title>
   </ion-navbar>
-
 </ion-header>
 
 
 <ion-content padding>
+  <ion-card>
+    <ion-card-header>
+      What you can do here?
+    </ion-card-header>
 
+    <ion-list>
+      <button ion-item (click)="onLoadShelfPage()" >
+        <ion-icon name="book" item-start></ion-icon>
+        Shelf Details
+      </button>
+    </ion-list>
+  </ion-card>
 </ion-content>

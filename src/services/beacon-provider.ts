@@ -14,6 +14,7 @@ export class BeaconProvider implements OnDestroy {
 delegate: any;
 region: any;
 state: any;
+beacon: any;
 
 constructor(public platform: Platform, public events: Events, private ibeacon : IBeacon,
     public localNotifications: LocalNotifications,) {
@@ -36,14 +37,13 @@ this.delegate = this.ibeacon.Delegate();
 // Subscribe to some of the delegate’s event handlers
 this.delegate.didRangeBeaconsInRegion().subscribe(
 data => {
-    if(data.beacons.length > 0){
+    if(data.beacons.length > 0 ){
         data.beacons.forEach((beacon)=>{
             if(beacon.proximity == 'ProximityImmediate') {
                 console.log('Got data Ranging Beacons Publishing this data! -> ' + JSON.stringify(beacon));
-                
                 this.ibeacon.stopRangingBeaconsInRegion(this.region).then(()=> {
                     console.log('Stopped Ranging Beacons Now!');
-                    this.events.publish('didRangeBeaconsInRegion', beacon);
+                    this.events.publish('didRangeBeaconsInRegion', {beacon:beacon,region:this.region});
                  });
             }
         })
@@ -74,28 +74,38 @@ this.delegate.didExitRegion().subscribe(
 this.region = this.ibeacon.BeaconRegion('bedBeacons', 'B9407F30-F5F8-466E-AFF9-25556B579999',12870);
 
 console.log('Right before !');
-this.delegate.didDetermineStateForRegion().subscribe(
-    data => {
-        console.log('Inside observable');
-        console.log('Got Region State!' + data);
-        this.state = data.state;
-        if(this.state == 'CLRegionStateInside') {
-            this.ibeacon.startRangingBeaconsInRegion(this.region)
-                .then(
-                    () => {
-                        console.log('Started Ranging!');
-                        resolve(true);
-                    },
-                    error => {
-                        console.error('Failed to begin monitoring: ', error);
-                        resolve(false);
-                    }
-                );
-        }
-    }
-);
+// this.delegate.didDetermineStateForRegion().subscribe(
+//     data => {
+//         console.log('Inside observable');
+//         console.log('Got Region State!' + data);
+//         this.state = data.state;
+//         if(this.state == 'CLRegionStateInside') {
+//             this.ibeacon.startRangingBeaconsInRegion(this.region)
+//                 .then(
+//                     () => {
+//                         console.log('Started Ranging!');
+//                         resolve(true);
+//                     },
+//                     error => {
+//                         console.error('Failed to begin monitoring: ', error);
+//                         resolve(false);
+//                     }
+//                 );
+//         }
+//     }
+// );
 
-
+    this.ibeacon.startRangingBeaconsInRegion(this.region)
+        .then(
+            () => {
+                console.log('Started Ranging!');
+                resolve(true);
+            },
+            error => {
+                console.error('Failed to begin monitoring: ', error);
+                resolve(false);
+            }
+        );
 this.ibeacon.startMonitoringForRegion(this.region).then(() => {
     console.log('Started monitoring for region!');
 });

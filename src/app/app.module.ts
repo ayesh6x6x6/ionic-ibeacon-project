@@ -13,6 +13,8 @@ import { LocalNotifications } from '@ionic-native/local-notifications';
 import { YellowPage } from '../pages/yellow/yellow';
 import { PinkPage } from '../pages/pink/pink';
 import { WhitePage } from '../pages/white/white';
+import { ShelfDetailsPage } from '../pages/shelf-details/shelf-details';
+import { HTTP } from '@ionic-native/http';
 
 @NgModule({
   declarations: [
@@ -21,7 +23,8 @@ import { WhitePage } from '../pages/white/white';
     NextPage,
     YellowPage,
     PinkPage,
-    WhitePage
+    WhitePage,
+    ShelfDetailsPage
   ],
   imports: [
     BrowserModule,
@@ -34,7 +37,8 @@ import { WhitePage } from '../pages/white/white';
     NextPage,
     YellowPage,
     PinkPage,
-    WhitePage
+    WhitePage,
+    ShelfDetailsPage
   ],
   providers: [
     StatusBar,
@@ -42,7 +46,8 @@ import { WhitePage } from '../pages/white/white';
     IBeacon,
     BeaconProvider,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
-    LocalNotifications
+    LocalNotifications,
+    HTTP
   ]
 })
 export class AppModule {}

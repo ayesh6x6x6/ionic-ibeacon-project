@@ -1,0 +1,43 @@
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>Our Own Little Shelf!</ion-title>
+    <ion-buttons end>
+      <button ion-button block (click)="onShelfToHome()" >Home</button>
+    </ion-buttons>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+  <ion-card>
+    <img src="http://t0.gstatic.com/images?q=tbn:ANd9GcRlOq9eMvpFV8FtRQSYXMvlGbVPD2ODIA3TSzGJprNMSoidGxvE"/>
+
+    <ion-card-content>
+      <ion-card-title>
+        Dracula
+      </ion-card-title>
+      <p>
+        The single most influential book in vampiric lore, and one of the great works of Gothic Literature!
+      </p>
+      <p>Author: Bram Stoker</p>
+      <p>Year: 1897</p>
+    </ion-card-content>
+
+    <ion-row no-padding>
+        <ion-col>
+          <button ion-button clear small color="danger" icon-start>
+            <ion-icon name='star'></ion-icon>
+            Favorite
+          </button>
+        </ion-col>
+        <ion-col >
+          <button ion-button clear small color="danger" icon-start>
+            <ion-icon name='share-alt'></ion-icon>
+            Share
+          </button>
+        </ion-col>
+      </ion-row>
+  </ion-card>
+</ion-content>

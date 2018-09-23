@@ -7,30 +7,17 @@
   </ion-header>
   
   <ion-content padding>
-    <button [navPush]="nxtPage" ion-button >Next</button>
       <ion-list no-lines>
   
-          <ion-item *ngFor="let beacon of beacons">
-          <ion-grid>
-          <ion-row>
-            <ion-col>UUID</ion-col>
-            <ion-col>{{beacon.uuid}}</ion-col>
-          </ion-row>
-          <ion-row>
-          <ion-col>Major</ion-col>
-          <ion-col>{{beacon.major}}</ion-col>
-          </ion-row>
-          <ion-row>
-          <ion-col>Minor</ion-col>
-          <ion-col>{{beacon.minor}}</ion-col>
-          </ion-row>
-          <ion-row>
-          <ion-col>RSSI</ion-col>
-          <ion-col>{{beacon.rssi}}</ion-col>
-          </ion-row>
-          </ion-grid>
-          </ion-item>
+          <button *ngIf="isShelf" ion-button item-end icon-start (click)="onShelf()">
+             <ion-icon name="book"></ion-icon>
+              Browse Our Tiny Shelf!
+          </button>
+          <button *ngIf="isPS4" ion-button item-end icon-start (click)="onPS4()" >
+             <ion-icon name="logo-playstation"></ion-icon>
+              Start Playing Now!
+          </button>
           
-          </ion-list>
+      </ion-list>
   </ion-content>
   

@@ -1,7 +1,7 @@
 import { Component, NgZone, OnDestroy } from '@angular/core';
 import { NavController,Platform, Events } from 'ionic-angular';
 import { IBeacon, IBeaconDelegate } from '@ionic-native/ibeacon';
-import { NextPage } from '../next/next';
+import { HTTP } from '@ionic-native/http';
 import { BeaconProvider } from '../../services/beacon-provider';
 import { LocalNotifications } from '@ionic-native/local-notifications';
 import { AlertController } from 'ionic-angular';
@@ -17,20 +17,42 @@ import { YellowPage } from '../yellow/yellow';
 export class HomePage implements OnDestroy {
   delegate:IBeaconDelegate;
   beaconFound = false;
-  nxtPage = NextPage;
-  beacons = [];
+  beaconTemp:Number;
+  whitePage = WhitePage;
+  isShelf: boolean = false;
+  isPS4: boolean = false;
+  yellowPage = YellowPage;
   zone:any ;
   location: string = '';
 
   constructor(public alertCtrl: AlertController, public navCtrl: NavController, public platform: Platform,  
-      public localNotifications: LocalNotifications,
+      public localNotifications: LocalNotifications, private http: HTTP,
      private ibeacon: IBeacon,public beaconProvider: BeaconProvider, public events: Events) {
       this.zone = new NgZone({ enableLongStackTrace: false });
   }
 
   ngOnDestroy() {
     this.events.unsubscribe('didEnterRegion');
+    this.events.unsubscribe('didExitRegion');
     this.events.unsubscribe('didRangeBeaconsInRegion');
+  }
+
+  onShelf() {
+    this.navCtrl.push(this.whitePage, {beacon:this.beaconTemp});
+  }
+
+  onPS4() {
+    this.navCtrl.push(this.yellowPage, {beacon:this.beaconTemp});
+  }
+
+  ionViewWillLeave() {
+    this.events.unsubscribe('didEnterRegion');
+    this.events.unsubscribe('didExitRegion');
+    this.events.unsubscribe('didRangeBeaconsInRegion');
+  }
+
+  ionViewWillEnter() {
+    this.listenToBeaconEvents();
   }
 
   ionViewDidLoad() {
@@ -41,7 +63,7 @@ export class HomePage implements OnDestroy {
     if (isInitialised) {
      
       console.log('IS INITIALIZED');
-      this.listenToBeaconEvents();
+      
     }
     
     });
@@ -72,30 +94,41 @@ export class HomePage implements OnDestroy {
           });
         });
       });
-      this.events.subscribe('didRangeBeaconsInRegion', (beacon) => {
+      this.events.subscribe('didRangeBeaconsInRegion', (data) => {
         console.log('Inside Subscription');     
         this.zone.run(() => {
           console.log('INSIDE RUN');    
+          this.isShelf = false;
+          this.isPS4 = false;
           // // update the UI with the beacon list
           // let beaconList = data.beacons;
           // beaconList.forEach((beacon) => {
           //     this.beacons.push(beacon);
           // });   
-          console.log("Beacon collected: " + JSON.stringify(beacon));          
+          console.log("Beacon collected: " + JSON.stringify(data.beacon));          
         //  this.beacons.forEach((beacon)=> {
           //  if(beacon.proximity == 'ProximityImmediate') {
-             switch(beacon.minor) {
+            const uuid = data.beacon.uuid.toUpperCase();
+            this.http.get('http://192.168.1.11:3000/api/'+uuid+'/'+data.beacon.minor,{},{}).then(data=>{
+                console.log('Received Http Data: ' + data.data);
+                this.beaconTemp = data.data;
+                console.log('This is this.beacon:'+this.beaconTemp);
+            });
+             switch(data.beacon.minor) {
                case '38872': 
-              //  this.location = 'This is the back of the shop!';
-               this.navCtrl.push(WhitePage);
+              //  this.location = 'This is the Quiet Zone!';
+              this.ibeacon.stopRangingBeaconsInRegion(data.beacon.region);
+              this.isShelf = true;
                break;
                case '16549': 
               //  this.location = 'You are near the counter from where you can order!';
+              this.ibeacon.stopRangingBeaconsInRegion(data.beacon.region);
                this.navCtrl.push(PinkPage);
                break;
                case '45700': 
               //  this.location = 'This is one of our PS4 tables, you can connect and play! for 10 AED/hr!';
-               this.navCtrl.push(YellowPage);
+              this.ibeacon.stopRangingBeaconsInRegion(data.beacon.region); 
+               this.isPS4 = true;
                break;
                default: this.location = 'Nowhere Found!';
              }          
