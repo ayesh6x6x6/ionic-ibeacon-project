@@ -14,6 +14,7 @@ import { YellowPage } from '../yellow/yellow';
   selector: 'page-home',
   templateUrl: 'home.html'
 })
+
 export class HomePage implements OnDestroy {
   delegate:IBeaconDelegate;
   beaconFound = false;
@@ -109,7 +110,7 @@ export class HomePage implements OnDestroy {
         //  this.beacons.forEach((beacon)=> {
           //  if(beacon.proximity == 'ProximityImmediate') {
             const uuid = data.beacon.uuid.toUpperCase();
-            this.http.get('http://192.168.1.11:3000/api/'+uuid+'/'+data.beacon.minor,{},{}).then(data=>{
+            this.http.get('http://10.25.159.146:3000/api/'+uuid+'/'+data.beacon.minor,{},{}).then(data=>{
                 console.log('Received Http Data: ' + data.data);
                 this.beaconTemp = data.data;
                 console.log('This is this.beacon:'+this.beaconTemp);

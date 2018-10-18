@@ -1,0 +1,95 @@
+<ion-header>
+  <ion-navbar>
+    
+    <ion-title><ion-icon name="cafe" start></ion-icon> iBeacon Coffee Shop</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content class="body">
+  <div class="container">
+    <div class="header">      
+      <h2>Welcome to iBeacon Coffee Shop</h2>
+    </div>
+
+    
+  </div>
+
+  <div class=menu>
+    <ion-card>
+      <ion-card-header>
+        Explore 
+      </ion-card-header>
+    
+      <ion-list>
+          <button ion-item (click)="onSelectLogin()" >
+            <ion-icon name="log-in" item-start></ion-icon>
+            Login
+          </button>
+    
+        <!-- <button ion-item>
+          <ion-icon name="sunny" item-start></ion-icon>
+          Coffee Shop Current Conditions
+        </button> -->
+    
+        <!-- <button ion-item>
+          <ion-icon name="book" item-start></ion-icon>
+          Coffee Shop Library
+        </button> -->
+
+        <button ion-item (click)= "onGuestMode()">
+          <ion-icon name="arrow-round-forward" item-start ></ion-icon>
+          Continue as Guest
+        </button>
+
+        <button ion-item>
+          <ion-icon name="information" item-start></ion-icon>
+          About
+        </button>
+
+      </ion-list>
+    </ion-card>
+  </div>
+
+  <div *ngIf="loginFlag" class = login>
+
+  <form #f="ngForm" (ngSubmit)="onSignin(f)" >
+    <ion-list>
+        <ion-item>
+          <ion-label fixed>Mail</ion-label>
+          <ion-input type="email" [(ngModel)]="user.email" name="email" required></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label fixed>Password</ion-label>
+          <ion-input type="password" [(ngModel)]="user.password" name="password" [minlength]="6" required></ion-input>
+        </ion-item>
+    </ion-list>
+    <button ion-button block type="submit" [disabled]="!f.valid" >Sign In</button>
+  </form>
+  <button ion-button round block (click)="onClickRegister()" >Dont have an account? Click to register!</button>
+    
+  </div>
+
+  <div *ngIf="registerFlag">
+    <form #registerForm="ngForm" (ngSubmit)="onSignup(registerForm)" >
+      <ion-list>
+        <ion-item>
+          <ion-label fixed>Name</ion-label>
+          <ion-input type="text" [(ngModel)]="user.username" name="username" required></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label fixed>Mail</ion-label>
+          <ion-input type="email" [(ngModel)]="user.email" name="email" required></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label fixed>Password</ion-label>
+          <ion-input type="password" [(ngModel)]="user.password" name="password" [minlength]="6" required></ion-input>
+        </ion-item>
+      </ion-list>
+      <button ion-button block type="submit" [disabled]="!registerForm.valid" >Register</button>
+    </form>
+    
+  </div>
+
+</ion-content>
+
+

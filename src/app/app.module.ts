@@ -15,6 +15,11 @@ import { PinkPage } from '../pages/pink/pink';
 import { WhitePage } from '../pages/white/white';
 import { ShelfDetailsPage } from '../pages/shelf-details/shelf-details';
 import { HTTP } from '@ionic-native/http';
+import { InfoPage } from '../pages/yellow/info/info';
+import { GameDetailsPage } from '../pages/yellow/game-details/game-details';
+import { StepsPsPage } from '../pages/yellow/steps-ps/steps-ps';
+import { LandingPage } from '../pages/landing/landing';
+import { UserPage } from '../pages/user/user';
 
 @NgModule({
   declarations: [
@@ -24,7 +29,12 @@ import { HTTP } from '@ionic-native/http';
     YellowPage,
     PinkPage,
     WhitePage,
-    ShelfDetailsPage
+    ShelfDetailsPage,
+    InfoPage,
+    GameDetailsPage,
+    StepsPsPage,
+    LandingPage,
+    UserPage
   ],
   imports: [
     BrowserModule,
@@ -38,7 +48,12 @@ import { HTTP } from '@ionic-native/http';
     YellowPage,
     PinkPage,
     WhitePage,
-    ShelfDetailsPage
+    ShelfDetailsPage,
+    InfoPage,
+    GameDetailsPage,
+    StepsPsPage,
+    LandingPage,
+    UserPage
   ],
   providers: [
     StatusBar,

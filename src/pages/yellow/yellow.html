@@ -1,7 +1,7 @@
 <ion-header>
 
   <ion-navbar>
-    <ion-title>Yellow</ion-title>
+    <ion-title>The Games Zone!</ion-title>
   </ion-navbar>
 
 </ion-header>
@@ -11,32 +11,25 @@
 
     <ion-card>
       <ion-card-header>
-        Time to play some PS4!!
+        <strong>Time to play some PS4!!</strong>
       </ion-card-header>
       <ion-card-content>
-        Also want to let you know you are in a zone with temperature {{beacon}} <ion-icon name="thermometer"></ion-icon> C!
+        <ion-list>
+          <button ion-item (click)="onInfo()">
+              <ion-icon name="information-circle" item-start></ion-icon>
+              Area Info
+          </button>
+
+          <button ion-item>
+              <ion-icon name="list" item-start></ion-icon>
+              Steps to connect your PS4
+          </button>
+
+          <button ion-item>
+              <ion-icon name="game-controller-b" item-start></ion-icon>
+              Our Games
+          </button>
+        </ion-list>
       </ion-card-content>
     </ion-card>
-    <!-- <ion-grid>
-      <ion-row>
-        <ion-col>Property</ion-col>
-        <ion-col>Value</ion-col>
-      </ion-row>
-      <ion-row>
-        <ion-col>ID</ion-col>
-        <ion-col>{{beacon.id}}</ion-col>
-      </ion-row>
-      <ion-row>
-        <ion-col>UUID</ion-col>
-        <ion-col>{{beacon.uuid}}</ion-col>
-      </ion-row>
-      <ion-row>
-        <ion-col>Major</ion-col>
-        <ion-col>{{beacon.major}}</ion-col>
-      </ion-row>
-      <ion-row>
-        <ion-col>Minor</ion-col>
-        <ion-col>{{beacon.minor}}</ion-col>
-      </ion-row>
-    </ion-grid> -->
 </ion-content>

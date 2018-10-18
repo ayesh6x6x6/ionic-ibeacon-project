@@ -90,6 +90,9 @@ app.use((req,res,next)=>{
     next();
   });
 
+var AuthController = require('./auth/AuthController');
+app.use('/api/auth', AuthController);
+
 app.get('/api/:uuid/:minor', (req,res)=>{
     console.log('Received a request');
     let id;
@@ -112,6 +115,8 @@ app.get('/api/:uuid/:minor', (req,res)=>{
         }
     });
 });
+
+
 
 
 

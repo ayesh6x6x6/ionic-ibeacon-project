@@ -1,0 +1,31 @@
+page-landing {
+    .body {
+        background-color: #6f4e37;
+    }
+
+    .container {
+        margin-top: 40px;
+        background-color: rgb(165, 194, 184);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        
+    }
+
+    .header {
+        text-align: center;
+        align-items: center
+    }
+    .card {
+        background-color: rgb(253, 56, 56); 
+      }
+      .button{
+          background-color: green;
+      }
+
+      .login{
+          padding: 10px;
+          margin-bottom: 1px;
+          margin-top: 20px;
+      }
+}

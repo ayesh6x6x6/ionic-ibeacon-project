@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
 import { IBeacon } from '@ionic-native/ibeacon';
+import { InfoPage } from './info/info';
 
 @Component({
   selector: 'page-yellow',
@@ -15,17 +16,22 @@ export class YellowPage implements OnInit {
     
   }
 
+  onInfo() {
+    this.ibeacon.stopRangingBeaconsInRegion(this.region);
+    this.navCtrl.push(InfoPage, {beacon: this.beacon});
+  }
+
   ngOnInit() {
     console.log('This is navparams: '+this.navParams.get('beacon'));
     this.beacon = JSON.parse(this.navParams.get('beacon'));
   }
+  ionViewWillUnload() {
+    console.log('Started Ranging Again!!');
+    this.ibeacon.startRangingBeaconsInRegion(this.region);
+  }
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad YellowPage');
-  }
-
-  ionViewDidLeave() {
-    this.ibeacon.startRangingBeaconsInRegion(this.region);
   }
 
 
