@@ -1,10 +1,13 @@
-import { Component, OnInit } from '@angular/core';
-import { NavController, NavParams } from 'ionic-angular';
+import { Component, OnInit, NgZone } from '@angular/core';
+import { Storage } from '@ionic/storage';
+import { NavController, NavParams, Events, LoadingController } from 'ionic-angular';
 import { HomePage } from '../home/home';
 import { User } from '../../models/user';
 import { NgForm } from '@angular/forms';
 import { HTTP } from '@ionic-native/http';
 import { UserPage } from '../user/user';
+import { BeaconProvider } from '../../services/beacon-provider';
+import { LocalNotifications } from '@ionic-native/local-notifications';
 
 @Component({
   selector: 'page-landing',
@@ -20,16 +23,82 @@ export class LandingPage implements OnInit {
     username: '',
     password: ''
   }; 
+  zone:any;
+  state:string = '';
+  loading:boolean = false;
 
   ngOnInit() {
     console.log('INISSSS');
   }
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, private http: HTTP) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, private http: HTTP
+    ,public beaconProvider: BeaconProvider,public events: Events,public localNotifications: LocalNotifications,
+    private loadingCtrl:LoadingController,private storage: Storage) {
+      this.zone = new NgZone({ enableLongStackTrace: false });
+      this.storage.get('User').then(user=>{
+        if(user){
+          console.log('Retrieved User from phone storage!');
+          this.http.post('http://10.25.159.146:3000/api/auth/login',user,{}).then(data=>{
+            const resp = JSON.parse(data.data);
+            console.log('Response from the server:'+resp.username);
+            console.log("Username:"+JSON.stringify(resp));
+            // console.log("Data is :"+ JSON.stringify(data.data.user.username)+":"+JSON.stringify(data.data.user.email));
+            this.loading = false;
+            this.navCtrl.push(this.userPage,{username:resp.username,email:resp.email,state:this.state});
+          });
+        }
+      });
   }
 
   ionViewDidLoad() {
-    console.log('ionViewDidLoad LandingPage');
+    this.events.subscribe('region',(data)=>{
+      console.log('State in subs');
+      console.log('State in data'+JSON.stringify(data));
+      this.zone.run(()=>{
+        console.log('State in reply:'+data.state);
+        this.state = data.state;
+      });
+      
+    });
+    this.beaconProvider.initialise().then((isInitialised) => {
+      console.log('NEVER INITIALIZEDDDDDD');
+    if (isInitialised) {
+     
+      console.log('IS INITIALIZED');
+      
+    }
+    
+    });
+    }
+
+  ionViewWillEnter() {
+    this.listenToBeaconEvents();
+  }
+
+  listenToBeaconEvents() {
+    this.events.subscribe('didEnterRegion', (data) => {
+      this.zone.run(()=> {
+        console.log('in Home.ts'+ data);
+        console.log('Entered Region');
+        this.localNotifications.schedule({
+          id: 1,
+          title:'SmartCafe',
+          text: 'Welcome to Coffee Shop!',
+          trigger: {at: new Date(new Date().getTime())}
+        });
+      }); 
+    });
+    this.events.subscribe('didExitRegion', (data) => {
+      this.zone.run(()=> {
+        console.log('Exited!');
+        this.localNotifications.schedule({
+          id: 2,
+          title:'SmartCafe',
+          text: 'Thanks for visiting us, hope to see you again soon!',
+          trigger: {at: new Date(new Date().getTime())}
+        });
+      });
+    });
   }
 
   onSelectLogin() {
@@ -42,13 +111,23 @@ export class LandingPage implements OnInit {
   }
 
   onSignin(form:NgForm) {
+    let loading = this.loadingCtrl.create({
+      content:'Logging you in..',
+      spinner: 'bubbles',
+      dismissOnPageChange: true
+    });
+    loading.present();
     this.http.post('http://10.25.159.146:3000/api/auth/login',this.user,{}).then(data=>{
       const resp = JSON.parse(data.data);
+      this.storage.set('User',{username:this.user.username,password:this.user.password,email:this.user.email}).then(done=>{
+        console.log('Saved user in phone storage:'+this.user.username+":"+this.user.password+':'+this.user.email);
+      });
       console.log('Response from the server:'+resp.username);
       console.log("Username:"+JSON.stringify(resp));
       // console.log("Data is :"+ JSON.stringify(data.data.user.username)+":"+JSON.stringify(data.data.user.email));
+      this.loading = false;
       this.navCtrl.push(this.userPage,{username:resp.username,email:resp.email});
-    })
+    });
   }
 
   onClickRegister(){
@@ -62,6 +141,9 @@ export class LandingPage implements OnInit {
     console.log("User value now is : "+ this.user.username + ":" + this.user.email + ":"+this.user.password);
     this.http.post('http://10.25.159.146:3000/api/auth/register',this.user,{}).then(data=>{
       console.log('Sent the post request');
+      this.storage.set('User',{username:this.user.username,password:this.user.password,email:this.user.email}).then(done=>{
+        console.log('Saved user in phone storage:'+this.user.username+":"+this.user.password+':'+this.user.email);
+      });
       console.log('Response from server:'+JSON.parse(data.data));
       this.navCtrl.push(this.userPage,{username:form.value.username,email:form.value.email});
     });

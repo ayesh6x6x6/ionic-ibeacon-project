@@ -1,4 +1,5 @@
 var express = require('express');
+var redis = require('redis');
 var router = express.Router();
 var bodyParser = require('body-parser');
 router.use(bodyParser.urlencoded({ extended: false }));
@@ -25,6 +26,8 @@ router.post('/register', function(req, res) {
       var token = jwt.sign({ id: user._id }, config.secret, {
         expiresIn: 86400 // expires in 24 hours
       });
+      
+
       console.log("Created a user!");
       res.status(200).send({ auth: true, token: token });
     }); 

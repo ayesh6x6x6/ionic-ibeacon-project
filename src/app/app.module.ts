@@ -3,6 +3,7 @@ import { ErrorHandler, NgModule } from '@angular/core';
 import { IonicApp, IonicErrorHandler, IonicModule } from 'ionic-angular';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
+import { IonicStorageModule } from '@ionic/storage';
 
 import { MyApp } from './app.component';
 import { HomePage } from '../pages/home/home';
@@ -20,6 +21,7 @@ import { GameDetailsPage } from '../pages/yellow/game-details/game-details';
 import { StepsPsPage } from '../pages/yellow/steps-ps/steps-ps';
 import { LandingPage } from '../pages/landing/landing';
 import { UserPage } from '../pages/user/user';
+import { HeaderMenuComponent } from '../components/header-menu/header-menu';
 
 @NgModule({
   declarations: [
@@ -34,11 +36,13 @@ import { UserPage } from '../pages/user/user';
     GameDetailsPage,
     StepsPsPage,
     LandingPage,
-    UserPage
+    UserPage,
+    HeaderMenuComponent
   ],
   imports: [
     BrowserModule,
-    IonicModule.forRoot(MyApp)
+    IonicModule.forRoot(MyApp),
+    IonicStorageModule.forRoot()
   ],
   bootstrap: [IonicApp],
   entryComponents: [
