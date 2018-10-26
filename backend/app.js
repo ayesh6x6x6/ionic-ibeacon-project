@@ -5,6 +5,7 @@ const scanner = new BeaconScanner();
 const mongoose = require('mongoose');
 const Telemetry = require('./models/telemetry');
 const Beacon = require('./models/beacon');
+const MenuItem = require('./models/menuitem');
 const app = express();
  
  var mongodbHost = 'ds259912.mlab.com';
@@ -20,6 +21,36 @@ const app = express();
 var url = 'mongodb://'+authenticate+mongodbHost+':'+mongodbPort + '/' + mongodbDatabase;
 mongoose.connect(url).then( () => {
     console.log("Connected correctly to server.");
+    // const capp = new MenuItem({
+    //     _id:new mongoose.Types.ObjectId(),
+    //     img: "https://upload.wikimedia.org/wikipedia/commons/c/c8/Cappuccino_at_Sightglass_Coffee.jpg",
+    //     name: "Cappucino",
+    //     price: 15.5,
+    //     description: "a type of coffee made with espresso and milk that has been frothed up with pressurized steam."
+    // });
+    // const mocha = new MenuItem({
+    //     _id: new mongoose.Types.ObjectId(),
+    //     img: "http://theclassicvapeco.com/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/c/a/cafe-mocha-e-liquid.jpg",
+    //     name: "Mocha",
+    //     price: 14,
+    //     description: "also called mocaccino (Italian: [mokatˈtʃiːno]), is a chocolate-flavored variant of a caffè latte."
+    // });
+    // const latte = new MenuItem({
+    //     _id: new mongoose.Types.ObjectId(),
+    //     img: "https://www.nespresso.com/ncp/res/uploads/recipes/Caff%C3%A8%20Latte%20by%20Nespresso.jpg",
+    //     name: "Latte",
+    //     price: 10,
+    //     description: "A latte (/ˈlɑːteɪ/ or /ˈlæteɪ/)[1][2] is a coffee drink made with espresso and steamed milk."
+    // });
+    // capp.save().then(()=>{
+    //     console.log('Saved Cappucino');
+    // });
+    // mocha.save().then(()=>{
+    //     console.log('Saved Mocha!');
+    // });
+    // latte.save().then(()=>{
+    //     console.log('Saved Latte!');
+    // });
     // const beacon1 = new Beacon({
     //     "id": "ea00e4a9267f",
     //     "uuid": "B9407F30-F5F8-466E-AFF9-25556B579999",

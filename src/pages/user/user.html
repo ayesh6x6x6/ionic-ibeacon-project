@@ -11,16 +11,91 @@
 
 
 <ion-content padding>
-  <ion-list no-lines>
+  <ion-grid fixed>
+    <ion-row>
+      <ion-col>
+          <ion-slides style="width: 100%" autoplay="2000" pager="true" loop="true" >
+              <ion-slide style="width:100%">
+                <img style="margin-bottom: 25px;" src='https://static1.squarespace.com/static/564040d2e4b07f3c5ad9a4c5/t/5ad4750b0e2e7224de57b7d9/1523873056938/SUTTON-Big-Square-Board-Offers-20183.jpg' >
+                <div style="padding-bottom: 12px">
+                  <h3>Offer 1</h3>
+                </div>                
+              </ion-slide>
+              <ion-slide style="width:100%"> 
+                <img style="margin-bottom: 25px;" src='https://static1.squarespace.com/static/564040d2e4b07f3c5ad9a4c5/t/5ad47441aa4a9904672325c0/1523872850917/SUTTON-Big-Square-Board-Offers-2018.jpg' >
+                <div style="padding-bottom: 12px">
+                  <h3>Offer 2</h3>
+                </div>                
+              </ion-slide>
+              <ion-slide style="width:100%">
+                <img style="margin-bottom: 25px;" src="https://static1.squarespace.com/static/564040d2e4b07f3c5ad9a4c5/t/5ad474d6aa4a9904672332b5/1523873005340/SUTTON-Big-Square-Board-Offers-20182.jpg">
+                <div style="padding-bottom: 12px">
+                  <h3>Offer 3</h3>
+                </div>                
+              </ion-slide>
+          </ion-slides>  
+      </ion-col>
+    </ion-row>
   
-    <button *ngIf="isShelf" ion-button item-end icon-start (click)="onShelf()">
-       <ion-icon name="book"></ion-icon>
-        Browse Our Tiny Shelf!
-    </button>
-    <button *ngIf="isPS4" ion-button item-end icon-start (click)="onPS4()" >
-       <ion-icon name="logo-playstation"></ion-icon>
-        Start Playing Now!
-    </button>
-    
-</ion-list>
+  <ion-row>
+    <ion-col>
+        <ion-card>
+            <img src="http://keynotesbh.com/wp-content/uploads/2016/02/coffee_shop_design-sized.jpg"/>
+            <!-- <div class="card-title">Place Order</div>
+            <div class="card-subtitle">You know you want to!</div> -->
+            <ion-card-content>
+              <ion-card-title>
+                Place Order
+              </ion-card-title>
+            </ion-card-content>
+        </ion-card>
+    </ion-col>
+    <ion-col>
+        <ion-card>
+          <img src="https://phanmemhopnhat.vn/wp-content/uploads/2018/01/coffee-shop.jpg">
+          <!-- <div class="card-title">Shop Status</div>
+          <div class="card-subtitle">Get Comfortable!</div> -->
+          <ion-card-content>
+              <ion-card-title>
+                Shop Status
+              </ion-card-title>
+          </ion-card-content>
+        </ion-card>
+    </ion-col>
+  </ion-row>
+  
+  <ion-row>
+    <ion-col>
+      <ion-card>
+            <img src="https://img.etimg.com/thumb/msid-63414140,width-643,imgsize-319413,resizemode-4/coffee-lovers-rejoice-heres-the-key-to-brew-the-perfect-cup-of-espresso-every-day.jpg"/>
+            <ion-card-content>
+              <ion-card-title>
+                What Can You Do Here?
+              </ion-card-title>
+              <p *ngIf="!isShelf && !isPS4" >
+                Not much to do here right now!
+              </p>
+              <button *ngIf="isShelf" ion-button item-end icon-start (click)="onShelf()">
+                  <ion-icon name="book"></ion-icon>
+                    Browse Our Tiny Shelf!
+              </button>
+              <button *ngIf="isPS4" ion-button item-end icon-start (click)="onPS4()" >
+                  <ion-icon name="logo-playstation"></ion-icon>
+                    Start Playing Now!
+              </button>
+            </ion-card-content>
+      </ion-card>
+    </ion-col>
+  </ion-row>
+  <!-- <ion-list no-lines>
+    <ion-row>
+        
+    </ion-row>
+    <ion-row>
+        
+    </ion-row>      
+      
+      
+  </ion-list> -->
+</ion-grid>
 </ion-content>

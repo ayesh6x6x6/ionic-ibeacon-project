@@ -4,7 +4,9 @@ const userSchema = mongoose.Schema({
     // _id: mongoose.Schema.Types.ObjectId,
     username: String,
     email: String,
-    password: String
+    password: String,
+    favItems: [{ type: mongoose.Schema.Types.ObjectId, ref: 'MenuItem' }],
+    orderHistory: [{type: mongoose.Schema.Types.ObjectId, ref: 'MenuItem'}]
 });
 
 module.exports = mongoose.model('User',userSchema);
