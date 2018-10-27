@@ -3,17 +3,54 @@
     <ion-toolbar>
         <ion-title>Browse Menu </ion-title>
         <button ion-button icon-only menuToggle>
-          <ion-icon name="menu"></ion-icon>
+            <ion-icon name="menu"></ion-icon>
         </button>
+        <ion-buttons end>            
+            <button navPop ion-button icon-start>
+                <ion-icon name="home" ></ion-icon>
+                Home
+            </button>
+            <button [navPush]="cartPage" ion-button icon-only >
+              <ion-icon name="cart" ></ion-icon>
+            </button>
+        </ion-buttons>
+        
     </ion-toolbar>
 
 </ion-header>
 
 
 <ion-content padding>
-    <ion-grid>
-      <ion-row>
-        <ion-col></ion-col>
+    <ion-grid no-padding fixed>
+      <ion-row *ngFor="let item of menuItems" >
+        <ion-col>
+          <ion-card>
+            <img src="{{item.img}}">
+            <ion-card-content>
+              <ion-card-title>
+                {{item.name}}
+              </ion-card-title>
+              <p>{{item.description}}</p>
+              <div>
+                  AED {{item.price}}
+              </div>
+            </ion-card-content>
+            <ion-row>
+              <ion-col col-5>
+                <button (click)="addToCart(item)" ion-button icon-start clear small >
+                  <ion-icon name="cart" ></ion-icon>
+                  Add To Cart
+                </button>
+              </ion-col>
+              <ion-col col-7>
+                <button ion-button icon-start clear small >
+                  <ion-icon name="star" ></ion-icon>
+                  Add To Favorites
+                </button>
+              </ion-col>
+            </ion-row>
+          </ion-card>
+        </ion-col>
       </ion-row>
     </ion-grid>
 </ion-content>

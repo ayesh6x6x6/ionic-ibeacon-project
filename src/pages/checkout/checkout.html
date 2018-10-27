@@ -1,0 +1,23 @@
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>Payment Method</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+  <ion-list>
+    <ion-item>
+        <ion-icon name="card" ></ion-icon>
+        <h2>Online Payment</h2>
+        <p>Choose to pay with card or Paypal</p>
+    </ion-item>
+    <ion-item (click)="onCash()">
+      <ion-icon name="cash" ></ion-icon>
+      <h2>Pay by Cash</h2>
+      <p>Head over to our counter to pay by cash</p>
+    </ion-item>
+  </ion-list>
+</ion-content>

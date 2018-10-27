@@ -22,6 +22,9 @@ import { StepsPsPage } from '../pages/yellow/steps-ps/steps-ps';
 import { LandingPage } from '../pages/landing/landing';
 import { UserPage } from '../pages/user/user';
 import { HeaderMenuComponent } from '../components/header-menu/header-menu';
+import { MenuPage } from '../pages/menu/menu';
+import { CartPage } from '../pages/cart/cart';
+import { CheckoutPage } from '../pages/checkout/checkout';
 
 @NgModule({
   declarations: [
@@ -37,7 +40,10 @@ import { HeaderMenuComponent } from '../components/header-menu/header-menu';
     StepsPsPage,
     LandingPage,
     UserPage,
-    HeaderMenuComponent
+    HeaderMenuComponent,
+    MenuPage,
+    CartPage,
+    CheckoutPage
   ],
   imports: [
     BrowserModule,
@@ -57,7 +63,10 @@ import { HeaderMenuComponent } from '../components/header-menu/header-menu';
     GameDetailsPage,
     StepsPsPage,
     LandingPage,
-    UserPage
+    UserPage,
+    MenuPage,
+    CartPage,
+    CheckoutPage
   ],
   providers: [
     StatusBar,

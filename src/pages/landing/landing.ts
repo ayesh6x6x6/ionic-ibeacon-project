@@ -1,6 +1,6 @@
 import { Component, OnInit, NgZone } from '@angular/core';
 import { Storage } from '@ionic/storage';
-import { NavController, NavParams, Events, LoadingController } from 'ionic-angular';
+import { NavController, NavParams, Events, LoadingController, ToastController, Toast } from 'ionic-angular';
 import { HomePage } from '../home/home';
 import { User } from '../../models/user';
 import { NgForm } from '@angular/forms';
@@ -33,7 +33,7 @@ export class LandingPage implements OnInit {
 
   constructor(public navCtrl: NavController, public navParams: NavParams, private http: HTTP
     ,public beaconProvider: BeaconProvider,public events: Events,public localNotifications: LocalNotifications,
-    private loadingCtrl:LoadingController,private storage: Storage) {
+    private loadingCtrl:LoadingController,private storage: Storage, private toastCtrl:ToastController) {
       this.zone = new NgZone({ enableLongStackTrace: false });
       this.storage.get('User').then(user=>{
         if(user){
@@ -139,7 +139,20 @@ export class LandingPage implements OnInit {
     console.log("form value password:" + form.value.password );
     console.log("form value email:" + form.value.email );
     console.log("User value now is : "+ this.user.username + ":" + this.user.email + ":"+this.user.password);
+    let toast = this.toastCtrl.create({
+      message: 'Registered User Successfully!',
+      duration: 3000,
+      position: 'bottom'
+    });
+    let loading = this.loadingCtrl.create({
+      content:'Registering you',
+      spinner: 'bubbles',
+      dismissOnPageChange: true,
+      showBackdrop: true
+    });
+    loading.present();
     this.http.post('http://10.25.159.146:3000/api/auth/register',this.user,{}).then(data=>{
+      toast.present();
       console.log('Sent the post request');
       this.storage.set('User',{username:this.user.username,password:this.user.password,email:this.user.email}).then(done=>{
         console.log('Saved user in phone storage:'+this.user.username+":"+this.user.password+':'+this.user.email);

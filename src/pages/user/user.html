@@ -11,7 +11,7 @@
 
 
 <ion-content padding>
-  <ion-grid fixed>
+  <ion-grid no-padding>
     <ion-row>
       <ion-col>
           <ion-slides style="width: 100%" autoplay="2000" pager="true" loop="true" >
@@ -39,7 +39,7 @@
   
   <ion-row>
     <ion-col>
-        <ion-card>
+        <ion-card (click)="onOrder()">
             <img src="http://keynotesbh.com/wp-content/uploads/2016/02/coffee_shop_design-sized.jpg"/>
             <!-- <div class="card-title">Place Order</div>
             <div class="card-subtitle">You know you want to!</div> -->

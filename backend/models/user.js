@@ -6,7 +6,7 @@ const userSchema = mongoose.Schema({
     email: String,
     password: String,
     favItems: [{ type: mongoose.Schema.Types.ObjectId, ref: 'MenuItem' }],
-    orderHistory: [{type: mongoose.Schema.Types.ObjectId, ref: 'MenuItem'}]
+    orderHistory: [{type: mongoose.Schema.Types.ObjectId, ref: 'Order'}]
 });
 
 module.exports = mongoose.model('User',userSchema);

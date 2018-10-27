@@ -6,6 +6,7 @@ import { WhitePage } from '../white/white';
 import { YellowPage } from '../yellow/yellow';
 import { PinkPage } from '../pink/pink';
 import { HTTP } from '@ionic-native/http';
+import { MenuPage } from '../menu/menu';
 
 @Component({
   selector: 'page-user',
@@ -24,11 +25,22 @@ export class UserPage implements OnInit {
   zone:any ;
   location: string = '';
   state:string = '';
+  uuidTable = [
+    '35730',
+    '1859',
+    '58350'
+  ];
+  baristaBeacons = ['58342'];
+  alertCount = 0;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public beaconProvider:BeaconProvider,
     public events: Events,private http: HTTP,
     private ibeacon: IBeacon,private alertCtrl: AlertController) {
       this.zone = new NgZone({ enableLongStackTrace: false });
+  }
+
+  onOrder(){
+    this.navCtrl.push(MenuPage);
   }
 
   ngOnInit() {
@@ -84,6 +96,7 @@ export class UserPage implements OnInit {
     // this.beaconProvider.findState();
 
     this.events.subscribe('didRangeBeaconsInRegion', (data) => {
+      // this.ibeacon.stopRangingBeaconsInRegion(data.beacon.region);
       console.log('Inside Subscription');     
       this.zone.run(() => {
         console.log('INSIDE RUN');    
@@ -93,10 +106,34 @@ export class UserPage implements OnInit {
       //  this.beacons.forEach((beacon)=> {
         //  if(beacon.proximity == 'ProximityImmediate') {
           const uuid = data.beacon.uuid.toUpperCase();
-          this.http.get('http://10.25.159.146:3000/api/'+uuid+'/'+data.beacon.minor,{},{}).then(data=>{
+          if(this.uuidTable.indexOf(data.beacon.minor) >= 0 && this.alertCount <= 0){        
+             this.alertCount = 1;
+             const confirmOrder = this.alertCtrl.create({
+              title:'Place an Order?',
+              message: "Now that you're comfortable, You can begin browsing our menu, if you would like?",
+              buttons: [
+                {
+                  text: 'Not now',
+                  role: 'cancel'
+                },
+                {
+                  text: 'Yes, Continue',
+                  handler: () => {
+                    this.navCtrl.push(MenuPage);
+                  }
+                }
+              ]
+             });
+             confirmOrder.present();
+           } else if(this.baristaBeacons.indexOf(data.beacon.minor) >=0 ){
+             this.http.post('http://10.25.159.146:3000/api/tobarista',{username:this.username,email:this.email},{}).then(result=>{
+               console.log(result);
+             });
+           } else {
+            this.http.get('http://10.25.159.146:3000/api/'+uuid+'/'+data.beacon.minor,{},{}).then(data=>{
               console.log('Received Http Data: ' + data.data);
-              this.beaconTemp = data.data;
-              console.log('This is this.beacon:'+this.beaconTemp);
+                this.beaconTemp = data.data;
+                console.log('This is this.beacon:'+this.beaconTemp);             
           });
            switch(data.beacon.minor) {
              case '38872': 
@@ -115,7 +152,8 @@ export class UserPage implements OnInit {
              this.isPS4 = true;
              break;
              default: this.location = 'Nowhere Found!';
-           }          
+           }    
+          }      
         //  }
          console.log('Location now is : ' + this.location);
          console.log('Just before craeeting alert');   

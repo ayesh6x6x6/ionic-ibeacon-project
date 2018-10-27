@@ -6,17 +6,24 @@ const mongoose = require('mongoose');
 const Telemetry = require('./models/telemetry');
 const Beacon = require('./models/beacon');
 const MenuItem = require('./models/menuitem');
+const User = require('./models/user');
+const Order = require('./models/order');
 const app = express();
  
  var mongodbHost = 'ds259912.mlab.com';
  var mongodbPort = '59912';
  var authenticate = 'shilpa:est123@'; 
  var mongodbDatabase = '490_beacon';
+ var cart = [];
  var idTable = {
      38872:"39f774e86fece799",
      45700:"88e490df11769a5b",
      16549:"b19334231ae24c5e"    
  }
+ var uuidTable = [
+     'D0D3FA86-CA76-45EC-9BD9-6AF487801DC6',
+     'D0D3FA86-CA76-45EC-9BD9-6AF4FE1A9236'
+ ]
  
 var url = 'mongodb://'+authenticate+mongodbHost+':'+mongodbPort + '/' + mongodbDatabase;
 mongoose.connect(url).then( () => {
@@ -81,7 +88,7 @@ mongoose.connect(url).then( () => {
     scanner.onadvertisement = (ad) => {
         if(ad.beaconType == "estimoteTelemetry")
           {
-              console.log(ad);
+            //   console.log(ad);
             var temp = ad.estimoteTelemetry.temperature;
             if(temp != undefined)
             {
@@ -92,7 +99,7 @@ mongoose.connect(url).then( () => {
               temperature: temp
              });
               temporary.save().then(()=>{
-                  console.log('Saved a telemetry!');
+                //   console.log('Saved a telemetry!');
               });
             //   console.log("ID: ",ad.id," Temperature: ",temp);
             }
@@ -113,7 +120,8 @@ mongoose.connect(url).then( () => {
 }  
 );
 
-app.use(bodyParser.json());
+// app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use((req,res,next)=>{
     res.setHeader("Access-Control-Allow-Origin","*");
     res.setHeader("Access-Control-ALlow-Headers","Origin, X-Requested-With, Content-Type, Accept, Authorization");
@@ -124,27 +132,120 @@ app.use((req,res,next)=>{
 var AuthController = require('./auth/AuthController');
 app.use('/api/auth', AuthController);
 
-app.get('/api/:uuid/:minor', (req,res)=>{
-    console.log('Received a request');
-    let id;
-    Beacon.findOne({"uuid":req.params.uuid,"minor":req.params.minor},(err,result)=>{
+var user = {};
+
+app.get('/api/getuser',(req,res)=>{
+    res.status(200).json(user);
+});
+
+app.post('/api/tobarista',(req,res)=>{
+    console.log(req.body);
+    console.log(req.body.email);
+    const email = req.body.email;
+    User.findOne({email:email},(err,userr)=>{
         if(err){
             console.log(err);
         } else {
-            console.log(result);
-            console.log(result.id);
-            console.log(idTable[result.minor]);
-            Telemetry.findOne({"shortId":idTable[result.minor]},(err,result2)=>{
-                if(err) {
-                    res.status(404).send(err);
-                } else {
-                    res.status(200).json(result2.temperature);
-                }
-                
-            });
-            
+            user = userr;
+            console.log('User is now:'+user);
         }
     });
+});
+
+app.get('/api/getitems',(req,res)=>{
+    console.log('Getting items now!');
+    MenuItem.find((err,result)=>{
+        if(err){
+            console.log('Couldnt find any items!');
+        } else {
+            console.log(result);
+            res.status(200).json({items:result});
+        }
+    });
+});
+
+app.post('/api/checkout',(req,res)=>{
+    console.log(req.body);
+    console.log(req.body.user);
+    var userr = JSON.parse(req.body.user);
+    console.log(userr.username);
+    const cart = JSON.parse(req.body.cart);
+    console.log(cart);
+    let ord;
+    User.findOne({email:userr.email},(err,user)=>{
+        console.log(user);
+        const order = new Order({
+            customer:user,
+            bill:req.body.total,
+            items:cart
+        });
+        ord = order;
+        order.save();
+        console.log(order);
+        
+        // user.save(()=>{
+        //     console.log('Saved');
+        // });
+        console.log(user);
+        // User.findOneAndUpdate({email:user.email},{$push: {orderHistory:order}});
+        //     if(err){
+        //         console.log(err);
+        //     }
+        //     console.log(u);
+        // });
+        // res.send('Successfully updated');
+        userr = user;
+    }).then(resolve=>{
+        User.findByIdAndUpdate({_id:userr._id},{$push: {orderHistory:ord}},(err,r)=>{
+            console.log(r);
+        });
+    });
+    
+
+    
+});
+
+app.post('/api/addtocart',(req,res)=>{
+    const item = req.body.item;
+    console.log('Req body'+JSON.stringify(req.body));
+    console.log('Item received:' + JSON.stringify(item));
+    cart.push(item);
+    console.log('Added Item');
+    res.status(200).send('Added item!');
+});
+
+app.post('/api/removefromcart',(req,res)=>{
+    const item = req.body.item;
+    const index = cart.indexOf(item);
+    cart.splice(index,1);
+    res.status(200).send('Removed item!');
+});
+
+app.get('/api/getcartitems',(req,res)=>{
+    res.status(200).json({cart:cart});
+});
+
+app.get('/api/:uuid/:minor', (req,res)=>{
+    // console.log('Received a request');
+    const id = req.params.uuid;
+        Beacon.findOne({"uuid":req.params.uuid,"minor":req.params.minor},(err,result)=>{
+            if(err){
+                console.log(err);
+            } else {
+                // console.log(result);
+                // console.log(result.id);
+                // console.log(idTable[result.minor]);
+                Telemetry.findOne({"shortId":idTable[result.minor]},(err,result2)=>{
+                    if(err) {
+                        res.status(404).send(err);
+                    } else {
+                        res.status(200).json(result2.temperature);
+                    }
+                    
+                });
+                
+            }
+        });
 });
 
 
