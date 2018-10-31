@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { NavController, NavParams, ToastController } from 'ionic-angular';
 import { HTTP } from '@ionic-native/http';
 import { Storage } from '@ionic/storage';
+import { UserPage } from '../user/user';
 
 @Component({
   selector: 'page-checkout',
@@ -30,8 +31,9 @@ export class CheckoutPage implements OnInit {
       console.log('Found USer'+JSON.stringify(user));
       toast.present();
       this.http.post('http://10.25.159.146:3000/api/checkout',{total:this.total,cart:this.cartItems,user:user},{}).then(resp=>{
-
+        
       });
+      this.navCtrl.popToRoot();
     });
     
   }

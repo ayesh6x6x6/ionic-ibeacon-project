@@ -44,7 +44,7 @@ export class LandingPage implements OnInit {
             console.log("Username:"+JSON.stringify(resp));
             // console.log("Data is :"+ JSON.stringify(data.data.user.username)+":"+JSON.stringify(data.data.user.email));
             this.loading = false;
-            this.navCtrl.push(this.userPage,{username:resp.username,email:resp.email,state:this.state});
+            this.navCtrl.setRoot(this.userPage,{username:resp.username,email:resp.email,state:this.state});
           });
         }
       });
@@ -126,7 +126,7 @@ export class LandingPage implements OnInit {
       console.log("Username:"+JSON.stringify(resp));
       // console.log("Data is :"+ JSON.stringify(data.data.user.username)+":"+JSON.stringify(data.data.user.email));
       this.loading = false;
-      this.navCtrl.push(this.userPage,{username:resp.username,email:resp.email});
+      this.navCtrl.setRoot(this.userPage,{username:resp.username,email:resp.email});
     });
   }
 

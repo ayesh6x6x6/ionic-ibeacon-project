@@ -9,6 +9,8 @@ const MenuItem = require('./models/menuitem');
 const User = require('./models/user');
 const Order = require('./models/order');
 const app = express();
+const mqtt = require('mqtt');
+const broker = 'mqtt://test.mosquitto.org';
  
  var mongodbHost = 'ds259912.mlab.com';
  var mongodbPort = '59912';
@@ -28,6 +30,20 @@ const app = express();
 var url = 'mongodb://'+authenticate+mongodbHost+':'+mongodbPort + '/' + mongodbDatabase;
 mongoose.connect(url).then( () => {
     console.log("Connected correctly to server.");
+    var mqtt_client = mqtt.connect(broker);
+    
+    mqtt_client.on('connect', function () {
+        setInterval(()=>{
+            mqtt_client.publish('/ayesh/senior', 'Hello mqtt');
+            mqtt_client.subscribe('outTopic');
+            console.log('Published');
+        },3000);
+            
+          }
+        );
+    mqtt_client.on('message', (topic, payload) => {
+        console.log(`message from ${topic}: ${payload}`)
+    });
     // const capp = new MenuItem({
     //     _id:new mongoose.Types.ObjectId(),
     //     img: "https://upload.wikimedia.org/wikipedia/commons/c/c8/Cappuccino_at_Sightglass_Coffee.jpg",
@@ -120,6 +136,8 @@ mongoose.connect(url).then( () => {
 }  
 );
 
+
+
 // app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use((req,res,next)=>{
@@ -130,11 +148,16 @@ app.use((req,res,next)=>{
   });
 
 var AuthController = require('./auth/AuthController');
+app.use('/api/auth/logout', (req,res,next)=>{
+    cart = [];
+    next();
+});
 app.use('/api/auth', AuthController);
 
 var user = {};
 
 app.get('/api/getuser',(req,res)=>{
+    console.log('Received request for user');
     res.status(200).json(user);
 });
 
@@ -169,15 +192,15 @@ app.post('/api/checkout',(req,res)=>{
     console.log(req.body.user);
     var userr = JSON.parse(req.body.user);
     console.log(userr.username);
-    const cart = JSON.parse(req.body.cart);
-    console.log(cart);
+    const cart2 = JSON.parse(req.body.cart);
+    console.log(cart2);
     let ord;
     User.findOne({email:userr.email},(err,user)=>{
         console.log(user);
         const order = new Order({
             customer:user,
             bill:req.body.total,
-            items:cart
+            items:cart2
         });
         ord = order;
         order.save();
@@ -201,7 +224,7 @@ app.post('/api/checkout',(req,res)=>{
         });
     });
     
-
+    cart = [];
     
 });
 

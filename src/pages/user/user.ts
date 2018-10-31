@@ -7,6 +7,7 @@ import { YellowPage } from '../yellow/yellow';
 import { PinkPage } from '../pink/pink';
 import { HTTP } from '@ionic-native/http';
 import { MenuPage } from '../menu/menu';
+import { connect, Client, IConnackPacket } from 'mqtt';
 
 @Component({
   selector: 'page-user',
@@ -32,11 +33,24 @@ export class UserPage implements OnInit {
   ];
   baristaBeacons = ['58342'];
   alertCount = 0;
+  
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public beaconProvider:BeaconProvider,
     public events: Events,private http: HTTP,
     private ibeacon: IBeacon,private alertCtrl: AlertController) {
       this.zone = new NgZone({ enableLongStackTrace: false });
+      const client:Client = connect('mqtt://test.mosquitto.org',{port:8080});
+      client.subscribe('/ayesh/senior', (err, granted) => {
+        // granted.forEach(({topic, qos}) => {
+        //     console.log(`subscribed to ${topic} with qos=${qos}`)
+        // })
+        // client.publish(TOPIC, PAYLOAD, {qos: 2})
+    }).on('message', (topic: string, payload: string) => {
+        console.log(`message from ${topic}: ${payload}`)
+        client.end()
+    }).on('connect', (packet: IConnackPacket) => {
+        console.log('connected!', JSON.stringify(packet))
+    });
   }
 
   onOrder(){
@@ -47,6 +61,7 @@ export class UserPage implements OnInit {
     this.username = this.navParams.get('username');
     this.email = this.navParams.get('email');
     this.state = this.navParams.get('state');
+
   }
 
   ionViewDidLoad() {    
@@ -106,25 +121,28 @@ export class UserPage implements OnInit {
       //  this.beacons.forEach((beacon)=> {
         //  if(beacon.proximity == 'ProximityImmediate') {
           const uuid = data.beacon.uuid.toUpperCase();
-          if(this.uuidTable.indexOf(data.beacon.minor) >= 0 && this.alertCount <= 0){        
-             this.alertCount = 1;
-             const confirmOrder = this.alertCtrl.create({
-              title:'Place an Order?',
-              message: "Now that you're comfortable, You can begin browsing our menu, if you would like?",
-              buttons: [
-                {
-                  text: 'Not now',
-                  role: 'cancel'
-                },
-                {
-                  text: 'Yes, Continue',
-                  handler: () => {
-                    this.navCtrl.push(MenuPage);
-                  }
-                }
-              ]
-             });
-             confirmOrder.present();
+          if(this.uuidTable.indexOf(data.beacon.minor) >= 0){        
+            if(this.alertCount <=0 ){
+              this.alertCount = 1;
+              const confirmOrder = this.alertCtrl.create({
+               title:'Place an Order?',
+               message: "Now that you're comfortable, You can begin browsing our menu, if you would like?",
+               buttons: [
+                 {
+                   text: 'Not now',
+                   role: 'cancel'
+                 },
+                 {
+                   text: 'Yes, Continue',
+                   handler: () => {
+                     this.navCtrl.push(MenuPage);
+                   }
+                 }
+               ]
+              });
+              confirmOrder.present();
+            }
+
            } else if(this.baristaBeacons.indexOf(data.beacon.minor) >=0 ){
              this.http.post('http://10.25.159.146:3000/api/tobarista',{username:this.username,email:this.email},{}).then(result=>{
                console.log(result);
