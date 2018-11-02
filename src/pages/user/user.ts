@@ -7,7 +7,7 @@ import { YellowPage } from '../yellow/yellow';
 import { PinkPage } from '../pink/pink';
 import { HTTP } from '@ionic-native/http';
 import { MenuPage } from '../menu/menu';
-import { connect, Client, IConnackPacket } from 'mqtt';
+import { connect, Client, IConnackPacket,IClientPublishOptions } from 'mqtt';
 
 @Component({
   selector: 'page-user',
@@ -33,21 +33,17 @@ export class UserPage implements OnInit {
   ];
   baristaBeacons = ['58342'];
   alertCount = 0;
+  client:Client;
   
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public beaconProvider:BeaconProvider,
     public events: Events,private http: HTTP,
     private ibeacon: IBeacon,private alertCtrl: AlertController) {
       this.zone = new NgZone({ enableLongStackTrace: false });
-      const client:Client = connect('mqtt://test.mosquitto.org',{port:8080});
-      client.subscribe('/ayesh/senior', (err, granted) => {
-        // granted.forEach(({topic, qos}) => {
-        //     console.log(`subscribed to ${topic} with qos=${qos}`)
-        // })
-        // client.publish(TOPIC, PAYLOAD, {qos: 2})
+      this.client = connect('mqtt://test.mosquitto.org',{port:8080});
+      this.client.subscribe('/ayesh/senior', (err, granted) => {
     }).on('message', (topic: string, payload: string) => {
-        console.log(`message from ${topic}: ${payload}`)
-        client.end()
+        console.log(`message from ${topic}: ${payload}`);
     }).on('connect', (packet: IConnackPacket) => {
         console.log('connected!', JSON.stringify(packet))
     });
@@ -144,9 +140,12 @@ export class UserPage implements OnInit {
             }
 
            } else if(this.baristaBeacons.indexOf(data.beacon.minor) >=0 ){
-             this.http.post('http://10.25.159.146:3000/api/tobarista',{username:this.username,email:this.email},{}).then(result=>{
-               console.log(result);
-             });
+             const opts:IClientPublishOptions = {retain:true,qos:0};
+             this.client.publish('/cafe/tobarista',JSON.stringify({username:this.username,email:this.email}),opts);
+             console.log('Published a user from phone!');          
+            //  this.http.post('http://10.25.159.146:3000/api/tobarista',{username:this.username,email:this.email},{}).then(result=>{
+            //    console.log(result);
+            //  });
            } else {
             this.http.get('http://10.25.159.146:3000/api/'+uuid+'/'+data.beacon.minor,{},{}).then(data=>{
               console.log('Received Http Data: ' + data.data);

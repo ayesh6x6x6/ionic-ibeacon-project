@@ -48,6 +48,7 @@
     "ionic-angular": "3.9.2",
     "ionicons": "3.0.0",
     "jsonwebtoken": "^8.3.0",
+    "lodash": "^4.17.11",
     "mongoose": "^5.2.17",
     "mosca": "^2.8.3",
     "mqtt": "^2.18.8",

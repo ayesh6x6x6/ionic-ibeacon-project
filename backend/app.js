@@ -157,6 +157,14 @@ app.use('/api/auth', AuthController);
 var user = {};
 
 app.get('/api/getuser',(req,res)=>{
+    User.findOne({email:req.body.email},(err,userr)=>{
+        if(err){
+            console.log(err);
+        } else {
+            user = userr;
+            console.log('User is now:'+user);
+        }
+    });
     console.log('Received request for user');
     res.status(200).json(user);
 });

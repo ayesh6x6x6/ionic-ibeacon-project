@@ -1,5 +1,6 @@
 const BeaconScanner = require('node-beacon-scanner');
 const express = require('express');
+var _ = require('lodash');
 const bodyParser = require('body-parser');
 const scanner = new BeaconScanner();
 const mongoose = require('mongoose');
@@ -14,9 +15,9 @@ const broker = 'mqtt://test.mosquitto.org';
 
  var cart = [];
  var idTable = {
-     38872:"39f774e86fece799",
-     45700:"88e490df11769a5b",
-     16549:"b19334231ae24c5e"    
+     '38872':"39f774e86fece799",
+     '45700':"88e490df11769a5b",
+     '16549':"b19334231ae24c5e"    
  }
  var uuidTable = [
      'D0D3FA86-CA76-45EC-9BD9-6AF487801DC6',
@@ -24,6 +25,8 @@ const broker = 'mqtt://test.mosquitto.org';
  ]
 
     var mqtt_client = mqtt.connect(broker);
+    mqtt_client.subscribe('/cafe/temperature/38872');
+    mqtt_client.subscribe('/cafe/temperature/45700');
     
     mqtt_client.on('connect', function () {
         scanner.onadvertisement = (ad) => {
@@ -31,9 +34,13 @@ const broker = 'mqtt://test.mosquitto.org';
               {
                 //   console.log(ad);
                 var temp = ad.estimoteTelemetry.temperature;
+                console.log(ad.estimoteTelemetry.shortIdentifier);
+                var minor = _.findKey(idTable, _.partial(_.isEqual, ad.estimoteTelemetry.shortIdentifier));
+                // var minor = _.findKey(idTable,function(o){return idTable[o] == ad.estimoteTelemetry.shortIdentifier});
+                console.log('Minor:'+minor);
                 if(temp != undefined)
                 {
-                 mqtt_client.publish("/cafe/temperature",String(temp));
+                 mqtt_client.publish("/cafe/temperature/"+minor,String(temp));
                  console.log('Published Temperature');
                 //   console.log("ID: ",ad.id," Temperature: ",temp);
                 }
@@ -52,7 +59,8 @@ const broker = 'mqtt://test.mosquitto.org';
             },30000); 
         setInterval(()=>{
             mqtt_client.publish('/ayesh/senior', 'Hello mqtt');
-            mqtt_client.subscribe('outTopic');
+            // mqtt_client.subscribe('/cafe/temperature/38872');
+            // mqtt_client.subscribe('/cafe/temperature/45700');
             console.log('Published');
         },3000);
             
@@ -73,20 +81,20 @@ app.use((req,res,next)=>{
     next();
   });
 
-  var user = {};
-app.post('/api/tobarista',(req,res)=>{
-    console.log(req.body);
-    console.log(req.body.email);
-    const email = req.body.email;
-    User.findOne({email:email},(err,userr)=>{
-        if(err){
-            console.log(err);
-        } else {
-            user = userr;
-            console.log('User is now:'+user);
-        }
-    });
-});
+//   var user = {};
+// app.post('/api/tobarista',(req,res)=>{
+//     console.log(req.body);
+//     console.log(req.body.email);
+//     const email = req.body.email;
+//     User.findOne({email:email},(err,userr)=>{
+//         if(err){
+//             console.log(err);
+//         } else {
+//             user = userr;
+//             console.log('User is now:'+user);
+//         }
+//     });
+// });
 
 app.get('/api/:uuid/:minor', (req,res)=>{
     // console.log('Received a request');
