@@ -6,27 +6,34 @@ const scanner = new BeaconScanner();
 const mongoose = require('mongoose');
 const Telemetry = require('./models/telemetry');
 const Beacon = require('./models/beacon');
-const MenuItem = require('./models/menuitem');
 const User = require('./models/user');
-const Order = require('./models/order');
 const app = express();
 const mqtt = require('mqtt');
-const broker = 'mqtt://test.mosquitto.org';
+const broker = 'mqtt://localhost';
 
- var cart = [];
- var idTable = {
+var mongodbHost = 'ds259912.mlab.com';
+var mongodbPort = '59912';
+var authenticate = 'shilpa:est123@'; 
+var mongodbDatabase = '490_beacon';
+
+var cart = [];
+var idTable = {
      '38872':"39f774e86fece799",
      '45700':"88e490df11769a5b",
      '16549':"b19334231ae24c5e"    
  }
- var uuidTable = [
+var uuidTable = [
      'D0D3FA86-CA76-45EC-9BD9-6AF487801DC6',
      'D0D3FA86-CA76-45EC-9BD9-6AF4FE1A9236'
- ]
-
-    var mqtt_client = mqtt.connect(broker);
-    mqtt_client.subscribe('/cafe/temperature/38872');
-    mqtt_client.subscribe('/cafe/temperature/45700');
+]
+var tableBeacons = {
+    '35730':'Business Sofas',
+    '1859': 'Business Zone',
+    '58350': 'Side Sofas'
+};
+var mqtt_client = mqtt.connect(broker);
+mqtt_client.subscribe('/cafe/temperature/38872');
+mqtt_client.subscribe('/cafe/temperature/45700');
     
     mqtt_client.on('connect', function () {
         scanner.onadvertisement = (ad) => {
@@ -40,7 +47,7 @@ const broker = 'mqtt://test.mosquitto.org';
                 console.log('Minor:'+minor);
                 if(temp != undefined)
                 {
-                 mqtt_client.publish("/cafe/temperature/"+minor,String(temp));
+                 mqtt_client.publish("/cafe/temperature/"+minor,String(temp),{retain:true});
                  console.log('Published Temperature');
                 //   console.log("ID: ",ad.id," Temperature: ",temp);
                 }
@@ -66,13 +73,62 @@ const broker = 'mqtt://test.mosquitto.org';
             
           }
         );
+        var len = false;
+var url = 'mongodb://'+authenticate+mongodbHost+':'+mongodbPort + '/' + mongodbDatabase;
+mongoose.connect(url).then( () => {
     mqtt_client.on('message', (topic, payload) => {
-        console.log(`message from ${topic}: ${payload}`)
-    });  
+        console.log(`message from ${topic}: ${payload}`);
+        if(topic.substring(0,11) == 'cafe/entry/'){
+            User.findOne({username:payload},(err,res)=>{
+                if(err){
+                    console.log(err);
+                } else {
+                    var zones = _.uniq(res.preferredZone);
+                    console.log('Zones is now:'+zones);
+                    var zone = zones[0];
+                    mqtt_client.publish('cafe/booktable',zone,{retain:true});
+                    console.log('Booked and payload is'+payload);
+                    mqtt_client.publish('cafe/booked/'+payload,JSON.stringify({username:payload,zone:zone}),{retain:true});
+                    // mqtt_client.unsubscribe('cafe/entry/#');
+                }
+            });
+        }
+        if(topic.substring(0,14) == 'cafe/favtable/'){
+            var result = JSON.parse(payload);
+            var username = result.username;
+            var tableBeacon = result.table;
+            var zone = tableBeacons[tableBeacon];
+            
+            console.log('Zone is:'+zone);
+            User.findOne({username:username},(err,res)=>{
+                var u = res.username;
+                console.log('u is:'+u);
+                if(err){
+                    console.log(err);
+                } else {
+                    if(res.preferredZone.length > 10) {
+                        len = true; 
+                    }
+                }
+            });
+            console.log('len is '+len);
+            if(len==false){
+                User.findOneAndUpdate({username:username},{$push:{preferredZone:zone}},(err,res)=>{
+                    if(err){
+                        console.log(err);
+                    } else {
+                        console.log(res);
+                    }
+                });
+            }
 
+        }
+    }); 
+    mqtt_client.subscribe('cafe/favtable/#');
+    mqtt_client.subscribe('cafe/entry/#');
+});
+    
 
-
-// app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use((req,res,next)=>{
     res.setHeader("Access-Control-Allow-Origin","*");
@@ -80,47 +136,5 @@ app.use((req,res,next)=>{
     res.setHeader("Access-Control-Allow-Methods","GET, POST, PATCH, PUT, DELETE, OPTIONS");
     next();
   });
-
-//   var user = {};
-// app.post('/api/tobarista',(req,res)=>{
-//     console.log(req.body);
-//     console.log(req.body.email);
-//     const email = req.body.email;
-//     User.findOne({email:email},(err,userr)=>{
-//         if(err){
-//             console.log(err);
-//         } else {
-//             user = userr;
-//             console.log('User is now:'+user);
-//         }
-//     });
-// });
-
-app.get('/api/:uuid/:minor', (req,res)=>{
-    // console.log('Received a request');
-    const id = req.params.uuid;
-        Beacon.findOne({"uuid":req.params.uuid,"minor":req.params.minor},(err,result)=>{
-            if(err){
-                console.log(err);
-            } else {
-                // console.log(result);
-                // console.log(result.id);
-                // console.log(idTable[result.minor]);
-                Telemetry.findOne({"shortId":idTable[result.minor]},(err,result2)=>{
-                    if(err) {
-                        res.status(404).send(err);
-                    } else {
-                        res.status(200).json(result2.temperature);
-                    }
-                    
-                });
-                
-            }
-        });
-});
-
-
-
-
 
 module.exports = app;

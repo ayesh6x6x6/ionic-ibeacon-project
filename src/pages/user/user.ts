@@ -18,7 +18,7 @@ export class UserPage implements OnInit {
   email:string='';
   delegate:IBeaconDelegate;
   beaconFound = false;
-  beaconTemp:Number;
+  beaconTemp:Number = 0;
   whitePage = WhitePage;
   isShelf: boolean = false;
   isPS4: boolean = false;
@@ -34,15 +34,28 @@ export class UserPage implements OnInit {
   baristaBeacons = ['58342'];
   alertCount = 0;
   client:Client;
+  reached:boolean = false;
   
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public beaconProvider:BeaconProvider,
     public events: Events,private http: HTTP,
     private ibeacon: IBeacon,private alertCtrl: AlertController) {
       this.zone = new NgZone({ enableLongStackTrace: false });
-      this.client = connect('mqtt://test.mosquitto.org',{port:8080});
-      this.client.subscribe('/ayesh/senior', (err, granted) => {
-    }).on('message', (topic: string, payload: string) => {
+      this.client = connect('mqtt://192.168.1.128',{port:3000});
+      
+      this.client.on('message', (topic: string, payload: string) => {
+      if(topic.substring(0,12)=='cafe/booked/'){
+        const resp = JSON.parse(payload);
+        console.log('Here at lastttttttttttttttttttt');
+        if(resp.username == this.username){
+          console.log('Inside correct');
+          this.reached = true;
+          
+        }
+      }
+        if(topic.substring(0,18)=='/cafe/temperature/'){
+          this.beaconTemp = Number(payload);
+        }
         console.log(`message from ${topic}: ${payload}`);
     }).on('connect', (packet: IConnackPacket) => {
         console.log('connected!', JSON.stringify(packet))
@@ -55,6 +68,7 @@ export class UserPage implements OnInit {
 
   ngOnInit() {
     this.username = this.navParams.get('username');
+    this.client.subscribe('cafe/booked/'+this.username);
     this.email = this.navParams.get('email');
     this.state = this.navParams.get('state');
 
@@ -64,6 +78,7 @@ export class UserPage implements OnInit {
     this.beaconProvider.scanBeacons();
     console.log('State in load:'+this.state);
     if(this.state == 'CLRegionStateInside'){
+      this.client.publish('cafe/entry/'+this.username,this.username,{retain:true,qos:0});
       let alert = this.alertCtrl.create({
         title: 'Welcome back ' + this.username,
         subTitle: 'Do you want to repeat any of your favorite orders?',
@@ -117,7 +132,12 @@ export class UserPage implements OnInit {
       //  this.beacons.forEach((beacon)=> {
         //  if(beacon.proximity == 'ProximityImmediate') {
           const uuid = data.beacon.uuid.toUpperCase();
-          if(this.uuidTable.indexOf(data.beacon.minor) >= 0){        
+          if(this.uuidTable.indexOf(data.beacon.minor) >= 0){  
+                
+            // if(this.reached == true){
+              this.client.publish('cafe/booktable',"Finish",{retain:true,qos:0});
+            // }
+            this.client.publish('cafe/favtable/'+this.username,JSON.stringify({username:this.username,table:data.beacon.minor}),{retain:true,qos:0});  
             if(this.alertCount <=0 ){
               this.alertCount = 1;
               const confirmOrder = this.alertCtrl.create({
@@ -147,11 +167,12 @@ export class UserPage implements OnInit {
             //    console.log(result);
             //  });
            } else {
-            this.http.get('http://10.25.159.146:3000/api/'+uuid+'/'+data.beacon.minor,{},{}).then(data=>{
-              console.log('Received Http Data: ' + data.data);
-                this.beaconTemp = data.data;
-                console.log('This is this.beacon:'+this.beaconTemp);             
-          });
+          //   this.http.get('http://10.25.159.146:3000/api/'+uuid+'/'+data.beacon.minor,{},{}).then(data=>{
+          //     console.log('Received Http Data: ' + data.data);
+          //       this.beaconTemp = data.data;
+          //       console.log('This is this.beacon:'+this.beaconTemp);             
+          // });
+           this.client.subscribe('/cafe/temperature/'+data.beacon.minor);
            switch(data.beacon.minor) {
              case '38872': 
             //  this.location = 'This is the Quiet Zone!';

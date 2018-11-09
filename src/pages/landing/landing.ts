@@ -38,7 +38,7 @@ export class LandingPage implements OnInit {
       this.storage.get('User').then(user=>{
         if(user){
           console.log('Retrieved User from phone storage!');
-          this.http.post('http://10.25.159.146:3000/api/auth/login',user,{}).then(data=>{
+          this.http.post('http://192.168.1.128:3005/api/auth/login',user,{}).then(data=>{
             const resp = JSON.parse(data.data);
             console.log('Response from the server:'+resp.username);
             console.log("Username:"+JSON.stringify(resp));
@@ -117,7 +117,7 @@ export class LandingPage implements OnInit {
       dismissOnPageChange: true
     });
     loading.present();
-    this.http.post('http://10.25.159.146:3000/api/auth/login',this.user,{}).then(data=>{
+    this.http.post('http://192.168.1.128:3005/api/auth/login',this.user,{}).then(data=>{
       const resp = JSON.parse(data.data);
       this.storage.set('User',{username:this.user.username,password:this.user.password,email:this.user.email}).then(done=>{
         console.log('Saved user in phone storage:'+this.user.username+":"+this.user.password+':'+this.user.email);
@@ -151,14 +151,14 @@ export class LandingPage implements OnInit {
       showBackdrop: true
     });
     loading.present();
-    this.http.post('http://10.25.159.146:3000/api/auth/register',this.user,{}).then(data=>{
+    this.http.post('http://192.168.1.128:3005/api/auth/register',this.user,{}).then(data=>{
       toast.present();
       console.log('Sent the post request');
       this.storage.set('User',{username:this.user.username,password:this.user.password,email:this.user.email}).then(done=>{
         console.log('Saved user in phone storage:'+this.user.username+":"+this.user.password+':'+this.user.email);
       });
       console.log('Response from server:'+JSON.parse(data.data));
-      this.navCtrl.push(this.userPage,{username:form.value.username,email:form.value.email});
+      this.navCtrl.setRoot(this.userPage,{username:form.value.username,email:form.value.email});
     });
   }
 

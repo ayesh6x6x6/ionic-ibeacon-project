@@ -25,7 +25,7 @@ export class MenuPage implements OnInit {
       duration: 3000,
       position: 'bottom'
     });
-    this.http.post('http://10.25.159.146:3000/api/addtocart',{item:this.item},{}).then(data=>{
+    this.http.post('http://192.168.1.128:3005/api/addtocart',{item:this.item},{}).then(data=>{
       toast.present();
       console.log(data.data);
     });
@@ -33,7 +33,7 @@ export class MenuPage implements OnInit {
 
   ngOnInit() {
     console.log('Menu Items'+this.menuItems);
-    this.http.get('http://10.25.159.146:3000/api/getitems',{},{}).then(data=>{
+    this.http.get('http://192.168.1.128:3005/api/getitems',{},{}).then(data=>{
       console.log(data.data);
       const items = JSON.parse(data.data);
       items.items.forEach((item)=>{

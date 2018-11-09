@@ -30,7 +30,7 @@ export class CheckoutPage implements OnInit {
     this.storage.get('User').then(user=>{
       console.log('Found USer'+JSON.stringify(user));
       toast.present();
-      this.http.post('http://10.25.159.146:3000/api/checkout',{total:this.total,cart:this.cartItems,user:user},{}).then(resp=>{
+      this.http.post('http://192.168.1.128:3005/api/checkout',{total:this.total,cart:this.cartItems,user:user},{}).then(resp=>{
         
       });
       this.navCtrl.popToRoot();

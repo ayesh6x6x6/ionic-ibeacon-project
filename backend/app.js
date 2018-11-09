@@ -9,8 +9,6 @@ const MenuItem = require('./models/menuitem');
 const User = require('./models/user');
 const Order = require('./models/order');
 const app = express();
-const mqtt = require('mqtt');
-const broker = 'mqtt://test.mosquitto.org';
  
  var mongodbHost = 'ds259912.mlab.com';
  var mongodbPort = '59912';
@@ -30,20 +28,6 @@ const broker = 'mqtt://test.mosquitto.org';
 var url = 'mongodb://'+authenticate+mongodbHost+':'+mongodbPort + '/' + mongodbDatabase;
 mongoose.connect(url).then( () => {
     console.log("Connected correctly to server.");
-    var mqtt_client = mqtt.connect(broker);
-    
-    mqtt_client.on('connect', function () {
-        setInterval(()=>{
-            mqtt_client.publish('/ayesh/senior', 'Hello mqtt');
-            mqtt_client.subscribe('outTopic');
-            console.log('Published');
-        },3000);
-            
-          }
-        );
-    mqtt_client.on('message', (topic, payload) => {
-        console.log(`message from ${topic}: ${payload}`)
-    });
     // const capp = new MenuItem({
     //     _id:new mongoose.Types.ObjectId(),
     //     img: "https://upload.wikimedia.org/wikipedia/commons/c/c8/Cappuccino_at_Sightglass_Coffee.jpg",
@@ -100,45 +84,10 @@ mongoose.connect(url).then( () => {
     // });
     // beacon3.save().then(()=>{
     //     console.log('Saved a beacon3');
-    // });
-    scanner.onadvertisement = (ad) => {
-        if(ad.beaconType == "estimoteTelemetry")
-          {
-            //   console.log(ad);
-            var temp = ad.estimoteTelemetry.temperature;
-            if(temp != undefined)
-            {
-              const temporary=new Telemetry({
-              //_id: new mongoose.Types.ObjectId(),
-              id: ad.id,
-              shortId: ad.estimoteTelemetry.shortIdentifier,
-              temperature: temp
-             });
-              temporary.save().then(()=>{
-                //   console.log('Saved a telemetry!');
-              });
-            //   console.log("ID: ",ad.id," Temperature: ",temp);
-            }
-          }
-         }
-        
-        // Start scanning
-        setInterval(()=>{            
-                scanner.startScan().then(() => {
-                    console.log('Started to scan.');
-                    setTimeout(()=>{
-                        scanner.stopScan();
-                    },15000);
-                  }).catch((error) => {console.error(error);});
-           
-        },30000); 
-    
+    // });    
 }  
 );
 
-
-
-// app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use((req,res,next)=>{
     res.setHeader("Access-Control-Allow-Origin","*");
@@ -167,20 +116,6 @@ app.get('/api/getuser',(req,res)=>{
     });
     console.log('Received request for user');
     res.status(200).json(user);
-});
-
-app.post('/api/tobarista',(req,res)=>{
-    console.log(req.body);
-    console.log(req.body.email);
-    const email = req.body.email;
-    User.findOne({email:email},(err,userr)=>{
-        if(err){
-            console.log(err);
-        } else {
-            user = userr;
-            console.log('User is now:'+user);
-        }
-    });
 });
 
 app.get('/api/getitems',(req,res)=>{
@@ -255,32 +190,5 @@ app.post('/api/removefromcart',(req,res)=>{
 app.get('/api/getcartitems',(req,res)=>{
     res.status(200).json({cart:cart});
 });
-
-app.get('/api/:uuid/:minor', (req,res)=>{
-    // console.log('Received a request');
-    const id = req.params.uuid;
-        Beacon.findOne({"uuid":req.params.uuid,"minor":req.params.minor},(err,result)=>{
-            if(err){
-                console.log(err);
-            } else {
-                // console.log(result);
-                // console.log(result.id);
-                // console.log(idTable[result.minor]);
-                Telemetry.findOne({"shortId":idTable[result.minor]},(err,result2)=>{
-                    if(err) {
-                        res.status(404).send(err);
-                    } else {
-                        res.status(200).json(result2.temperature);
-                    }
-                    
-                });
-                
-            }
-        });
-});
-
-
-
-
 
 module.exports = app;

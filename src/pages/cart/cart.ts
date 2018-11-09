@@ -15,7 +15,7 @@ export class CartPage implements OnInit {
   }
 
   ngOnInit() {
-    this.http.get('http://10.25.159.146:3000/api/getcartitems',{},{}).then(data=>{
+    this.http.get('http://192.168.1.128:3005/api/getcartitems',{},{}).then(data=>{
       const items = JSON.parse(data.data);
       console.log('Response:'+data.data);
       items.cart.forEach((item)=>{
@@ -32,7 +32,7 @@ export class CartPage implements OnInit {
   removeItem(item:any) {
     console.log('Item to remove:'+JSON.stringify(item));
     const index = this.cartItems.indexOf(item);
-    this.http.post('http://10.25.159.146:3000/api/removefromcart',{item:item},{}).then(data=>{
+    this.http.post('http://192.168.1.128:3005/api/removefromcart',{item:item},{}).then(data=>{
       console.log('Removed Item');
     })
     this.cartItems.splice(index,1);

@@ -15,7 +15,7 @@ export class HeaderMenuComponent {
   }
 
   logoutClicked() {
-    this.http.get('http://10.25.159.146:3000/api/auth/logout',{},{}).then(data=>{
+    this.http.get('http://192.168.1.128:3005/api/auth/logout',{},{}).then(data=>{
       console.log('LoggedOut');
       this.storage.remove('User');
       //this.authService.logout();
