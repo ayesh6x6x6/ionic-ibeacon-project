@@ -7,7 +7,10 @@ const userSchema = mongoose.Schema({
     password: String,
     favItems: [{ type: mongoose.Schema.Types.ObjectId, ref: 'MenuItem' }],
     orderHistory: [{type: mongoose.Schema.Types.ObjectId, ref: 'Order'}],
-    preferredZone: [{type:String}]
+    preferredZone: [{type:String}],
+    r:Number,
+    g:Number,
+    b:Number
 });
 
 module.exports = mongoose.model('User',userSchema);

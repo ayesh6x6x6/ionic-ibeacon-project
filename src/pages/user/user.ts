@@ -8,6 +8,7 @@ import { PinkPage } from '../pink/pink';
 import { HTTP } from '@ionic-native/http';
 import { MenuPage } from '../menu/menu';
 import { connect, Client, IConnackPacket,IClientPublishOptions } from 'mqtt';
+import { ShopStatusPage } from '../shop-status/shop-status';
 
 @Component({
   selector: 'page-user',
@@ -16,6 +17,7 @@ import { connect, Client, IConnackPacket,IClientPublishOptions } from 'mqtt';
 export class UserPage implements OnInit {
   username: string='';
   email:string='';
+  picture:string='';
   delegate:IBeaconDelegate;
   beaconFound = false;
   beaconTemp:Number = 0;
@@ -35,26 +37,35 @@ export class UserPage implements OnInit {
   alertCount = 0;
   client:Client;
   reached:boolean = false;
+  mqtt_connected = false;
   
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public beaconProvider:BeaconProvider,
-    public events: Events,private http: HTTP,
-    private ibeacon: IBeacon,private alertCtrl: AlertController) {
+              public events: Events,private http: HTTP,private ibeacon: IBeacon,private alertCtrl: AlertController) {
       this.zone = new NgZone({ enableLongStackTrace: false });
       this.client = connect('mqtt://192.168.1.128',{port:3000});
+      this.client.on('connect', ()=>{
+        console.log('Phone connected to mqtt broker');
+        this.mqtt_connected = true;
+      });
       
+
       this.client.on('message', (topic: string, payload: string) => {
-      if(topic.substring(0,12)=='cafe/booked/'){
-        const resp = JSON.parse(payload);
-        console.log('Here at lastttttttttttttttttttt');
-        if(resp.username == this.username){
-          console.log('Inside correct');
-          this.reached = true;
-          
-        }
-      }
         if(topic.substring(0,18)=='/cafe/temperature/'){
           this.beaconTemp = Number(payload);
+        }
+        if(topic.substring(0,15)=='cafe/booktable/'){
+          console.log('Got booktable');
+          const info = JSON.parse(payload);
+          const alert = this.alertCtrl.create({
+            title:"Table " + info.zone + " has been assigned to you!",
+            buttons:[              
+              {
+                text:'Ok'
+              }
+            ]
+          });
+          alert.present();
         }
         console.log(`message from ${topic}: ${payload}`);
     }).on('connect', (packet: IConnackPacket) => {
@@ -68,17 +79,17 @@ export class UserPage implements OnInit {
 
   ngOnInit() {
     this.username = this.navParams.get('username');
-    this.client.subscribe('cafe/booked/'+this.username);
     this.email = this.navParams.get('email');
     this.state = this.navParams.get('state');
-
+    this.picture = this.navParams.get('picture');
   }
 
   ionViewDidLoad() {    
+    this.client.subscribe(`cafe/booktable/${this.username}`);
     this.beaconProvider.scanBeacons();
     console.log('State in load:'+this.state);
     if(this.state == 'CLRegionStateInside'){
-      this.client.publish('cafe/entry/'+this.username,this.username,{retain:true,qos:0});
+      this.client.publish('cafe/entry/'+this.username,this.username);
       let alert = this.alertCtrl.create({
         title: 'Welcome back ' + this.username,
         subTitle: 'Do you want to repeat any of your favorite orders?',
@@ -119,85 +130,80 @@ export class UserPage implements OnInit {
   }
 
   ionViewWillEnter() {
-    // this.beaconProvider.findState();
-
+    this.events.subscribe('didEnterRegion', (data) => {
+      this.zone.run(()=> {
+        console.log('in Home.ts'+ data);
+        console.log('Entered Region');
+        this.client.publish('cafe/entry/'+this.username,this.username);
+      }); 
+    });
+    this.events.subscribe('didExitRegion',(data)=>{
+      this.zone.run(()=>{
+        this.client.publish(`cafe/logout/${this.username}`,this.username);
+      });
+    });
     this.events.subscribe('didRangeBeaconsInRegion', (data) => {
-      // this.ibeacon.stopRangingBeaconsInRegion(data.beacon.region);
       console.log('Inside Subscription');     
       this.zone.run(() => {
-        console.log('INSIDE RUN');    
-        this.isShelf = false;
-        this.isPS4 = false;
-        console.log("Beacon collected: " + JSON.stringify(data.beacon));          
-      //  this.beacons.forEach((beacon)=> {
-        //  if(beacon.proximity == 'ProximityImmediate') {
-          const uuid = data.beacon.uuid.toUpperCase();
-          if(this.uuidTable.indexOf(data.beacon.minor) >= 0){  
+      console.log('INSIDE RUN');    
+      this.isShelf = false;
+      this.isPS4 = false;
+      console.log("Beacon collected: " + JSON.stringify(data.beacon));          
+      const uuid = data.beacon.uuid.toUpperCase();
+      if(this.uuidTable.indexOf(data.beacon.minor) >= 0){  
                 
-            // if(this.reached == true){
-              this.client.publish('cafe/booktable',"Finish",{retain:true,qos:0});
-            // }
-            this.client.publish('cafe/favtable/'+this.username,JSON.stringify({username:this.username,table:data.beacon.minor}),{retain:true,qos:0});  
-            if(this.alertCount <=0 ){
-              this.alertCount = 1;
-              const confirmOrder = this.alertCtrl.create({
-               title:'Place an Order?',
-               message: "Now that you're comfortable, You can begin browsing our menu, if you would like?",
-               buttons: [
-                 {
-                   text: 'Not now',
-                   role: 'cancel'
-                 },
-                 {
-                   text: 'Yes, Continue',
-                   handler: () => {
-                     this.navCtrl.push(MenuPage);
-                   }
-                 }
-               ]
+        console.log('Finishing with: '+'Finish '+data.beacon.minor);
+        this.client.publish('cafe/users/'+this.username,JSON.stringify({user:this.username,table:data.beacon.minor}));
+        this.client.publish('cafe/booktable',JSON.stringify({zone:"Finish "+data.beacon.minor,r:0,g:0,b:0}));
+        this.client.publish('cafe/favtable/'+this.username,JSON.stringify({username:this.username,table:data.beacon.minor}));  
+        if(this.alertCount <=0 ){
+          this.alertCount = 1;
+          const confirmOrder = this.alertCtrl.create({
+            title:'Place an Order?',
+            message: "Now that you're comfortable, You can begin browsing our menu, if you would like?",
+            buttons: [
+              {
+               text: 'Not now',
+               role: 'cancel'
+              },
+              {
+               text: 'Yes, Continue',
+               handler: () => {
+               this.navCtrl.push(MenuPage);
+               }
+              }
+            ]
               });
               confirmOrder.present();
             }
 
            } else if(this.baristaBeacons.indexOf(data.beacon.minor) >=0 ){
-             const opts:IClientPublishOptions = {retain:true,qos:0};
-             this.client.publish('/cafe/tobarista',JSON.stringify({username:this.username,email:this.email}),opts);
+             this.client.publish(`cafe/tobarista/${this.username}`,JSON.stringify({username:this.username,email:this.email}));
              console.log('Published a user from phone!');          
-            //  this.http.post('http://10.25.159.146:3000/api/tobarista',{username:this.username,email:this.email},{}).then(result=>{
-            //    console.log(result);
-            //  });
            } else {
-          //   this.http.get('http://10.25.159.146:3000/api/'+uuid+'/'+data.beacon.minor,{},{}).then(data=>{
-          //     console.log('Received Http Data: ' + data.data);
-          //       this.beaconTemp = data.data;
-          //       console.log('This is this.beacon:'+this.beaconTemp);             
-          // });
+           this.client.publish('cafe/users/'+this.username, JSON.stringify({user:this.username,table:data.beacon.minor}));
            this.client.subscribe('/cafe/temperature/'+data.beacon.minor);
            switch(data.beacon.minor) {
              case '38872': 
-            //  this.location = 'This is the Quiet Zone!';
-            // this.ibeacon.stopRangingBeaconsInRegion(data.beacon.region);
-            this.isShelf = true;
+             this.isShelf = true;
              break;
              case '16549': 
-            //  this.location = 'You are near the counter from where you can order!';
-            // this.ibeacon.stopRangingBeaconsInRegion(data.beacon.region);
-            //  this.navCtrl.push(PinkPage);
              break;
-             case '45700': 
-            //  this.location = 'This is one of our PS4 tables, you can connect and play! for 10 AED/hr!';
-            // this.ibeacon.stopRangingBeaconsInRegion(data.beacon.region); 
+             case '45700':  
              this.isPS4 = true;
              break;
              default: this.location = 'Nowhere Found!';
            }    
           }      
-        //  }
          console.log('Location now is : ' + this.location);
          console.log('Just before craeeting alert');   
       
      }); 
   });
+  }
+
+  onViewConditions(){
+    this.navCtrl.push(ShopStatusPage);
   }
 
   onShelf() {

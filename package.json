@@ -21,6 +21,7 @@
     "@angular/platform-browser": "5.2.11",
     "@angular/platform-browser-dynamic": "5.2.11",
     "@ionic-native/core": "~4.12.0",
+    "@ionic-native/facebook": "^4.17.0",
     "@ionic-native/http": "^4.14.0",
     "@ionic-native/ibeacon": "^4.13.0",
     "@ionic-native/local-notifications": "^4.13.0",
@@ -28,13 +29,16 @@
     "@ionic-native/status-bar": "~4.12.0",
     "@ionic/storage": "2.1.3",
     "@types/paho-mqtt": "^1.0.3",
+    "axios": "^0.18.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.3",
     "com.unarin.cordova.beacon": "~3.7.0",
     "cordova-android": "7.0.0",
+    "cordova-android-support-gradle-release": "^2.0.1",
     "cordova-plugin-advanced-http": "^2.0.1",
     "cordova-plugin-badge": "^0.8.7",
     "cordova-plugin-device": "2.0.2",
+    "cordova-plugin-facebook4": "^3.1.0",
     "cordova-plugin-file": "^6.0.1",
     "cordova-plugin-ibeacon": "^3.7.0",
     "cordova-plugin-ionic-keyboard": "^2.1.2",
@@ -51,13 +55,13 @@
     "jsonwebtoken": "^8.3.0",
     "lodash": "^4.17.11",
     "mongoose": "^5.2.17",
-    "mosca": "^2.8.3",
     "mqtt": "^2.18.8",
     "node-beacon-scanner": "^0.1.0",
-    "redis": "^2.8.0",
-    "rxjs": "5.5.11",
+    "request": "^2.88.0",
+    "rxjs": "^6.3.3",
+    "rxjs-compat": "^6.3.3",
     "sw-toolbox": "3.6.0",
-    "zone.js": "0.8.26"
+    "zone.js": "^0.8.26"
   },
   "devDependencies": {
     "@ionic/app-scripts": "3.2.0",
@@ -78,7 +82,15 @@
       },
       "cordova-plugin-ionic-keyboard": {},
       "cordova-plugin-advanced-http": {},
-      "cordova-sqlite-storage": {}
+      "cordova-sqlite-storage": {},
+      "cordova-plugin-facebook4": {
+        "APP_ID": "289691595219023",
+        "APP_NAME": "SeniorLogin",
+        "FACEBOOK_ANDROID_SDK_VERSION": "4.37.0"
+      },
+      "cordova-android-support-gradle-release": {
+        "ANDROID_SUPPORT_VERSION": "27.+"
+      }
     },
     "platforms": [
       "android"

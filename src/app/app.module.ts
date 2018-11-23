@@ -25,6 +25,8 @@ import { HeaderMenuComponent } from '../components/header-menu/header-menu';
 import { MenuPage } from '../pages/menu/menu';
 import { CartPage } from '../pages/cart/cart';
 import { CheckoutPage } from '../pages/checkout/checkout';
+import { Facebook } from '@ionic-native/facebook';
+import { ShopStatusPage } from '../pages/shop-status/shop-status';
 
 @NgModule({
   declarations: [
@@ -43,7 +45,8 @@ import { CheckoutPage } from '../pages/checkout/checkout';
     HeaderMenuComponent,
     MenuPage,
     CartPage,
-    CheckoutPage
+    CheckoutPage,
+    ShopStatusPage
   ],
   imports: [
     BrowserModule,
@@ -66,13 +69,15 @@ import { CheckoutPage } from '../pages/checkout/checkout';
     UserPage,
     MenuPage,
     CartPage,
-    CheckoutPage
+    CheckoutPage,
+    ShopStatusPage
   ],
   providers: [
     StatusBar,
     SplashScreen,
     IBeacon,
     BeaconProvider,
+    Facebook,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
     LocalNotifications,
     HTTP

@@ -36,9 +36,9 @@
           Coffee Shop Library
         </button> -->
 
-        <button ion-item (click)= "onGuestMode()">
+        <button ion-item (click)= "onViewConditions()">
           <ion-icon name="arrow-round-forward" item-start ></ion-icon>
-          Continue as Guest
+          What's the scene right now?
         </button>
 
         <button ion-item>
@@ -65,6 +65,7 @@
     </ion-list>
     <button ion-button block type="submit" [disabled]="!f.valid" >Sign In</button>
   </form>
+  <button ion-button block (click)="onFb()" > <ion-icon name="logo-facebook" ></ion-icon> Log In With Facebook</button>
   <button ion-button round block (click)="onClickRegister()" >Dont have an account? Click to register!</button>
     
   </div>

@@ -25,7 +25,7 @@ export class MenuPage implements OnInit {
       duration: 3000,
       position: 'bottom'
     });
-    this.http.post('http://192.168.1.128:3005/api/addtocart',{item:this.item},{}).then(data=>{
+    this.http.post('https://smartcafeserver.herokuapp.com/api/addtocart',{item:this.item},{}).then(data=>{
       toast.present();
       console.log(data.data);
     });
@@ -33,7 +33,7 @@ export class MenuPage implements OnInit {
 
   ngOnInit() {
     console.log('Menu Items'+this.menuItems);
-    this.http.get('http://192.168.1.128:3005/api/getitems',{},{}).then(data=>{
+    this.http.get('https://smartcafeserver.herokuapp.com/api/getitems',{},{}).then(data=>{
       console.log(data.data);
       const items = JSON.parse(data.data);
       items.items.forEach((item)=>{

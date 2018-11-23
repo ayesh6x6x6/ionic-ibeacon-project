@@ -8,6 +8,8 @@ import { HTTP } from '@ionic-native/http';
 import { UserPage } from '../user/user';
 import { BeaconProvider } from '../../services/beacon-provider';
 import { LocalNotifications } from '@ionic-native/local-notifications';
+import { Facebook, FacebookLoginResponse } from '@ionic-native/facebook';
+import { ShopStatusPage } from '../shop-status/shop-status';
 
 @Component({
   selector: 'page-landing',
@@ -21,7 +23,8 @@ export class LandingPage implements OnInit {
   user: User = {
     email: '',
     username: '',
-    password: ''
+    password: '',
+    picture: 'https://at-cdn-s01.audiotool.com/2013/05/11/users/guess_audiotool/avatar256x256-709d163bfa4a4ebdb25160d094551c33.jpg'
   }; 
   zone:any;
   state:string = '';
@@ -33,18 +36,20 @@ export class LandingPage implements OnInit {
 
   constructor(public navCtrl: NavController, public navParams: NavParams, private http: HTTP
     ,public beaconProvider: BeaconProvider,public events: Events,public localNotifications: LocalNotifications,
-    private loadingCtrl:LoadingController,private storage: Storage, private toastCtrl:ToastController) {
+    private loadingCtrl:LoadingController,private storage: Storage, private toastCtrl:ToastController,
+    public fb: Facebook) {
       this.zone = new NgZone({ enableLongStackTrace: false });
       this.storage.get('User').then(user=>{
         if(user){
+          console.log(JSON.stringify(user));
           console.log('Retrieved User from phone storage!');
-          this.http.post('http://192.168.1.128:3005/api/auth/login',user,{}).then(data=>{
+          this.http.post('https://smartcafeserver.herokuapp.com/api/auth/login',user,{}).then(data=>{
             const resp = JSON.parse(data.data);
             console.log('Response from the server:'+resp.username);
             console.log("Username:"+JSON.stringify(resp));
             // console.log("Data is :"+ JSON.stringify(data.data.user.username)+":"+JSON.stringify(data.data.user.email));
             this.loading = false;
-            this.navCtrl.setRoot(this.userPage,{username:resp.username,email:resp.email,state:this.state});
+            this.navCtrl.setRoot(this.userPage,{picture:user.picture,username:resp.username,email:resp.email,state:this.state});
           });
         }
       });
@@ -105,6 +110,67 @@ export class LandingPage implements OnInit {
     this.loginFlag = !this.loginFlag;
   }
 
+  onFb(){
+    this.fb.login(['public_profile', 'user_photos', 'email', 'user_birthday'])
+    .then( (res: FacebookLoginResponse) => {
+
+        // The connection was successful
+        if(res.status == "connected") {
+
+            // Get user ID and Token
+            var fb_id = res.authResponse.userID;
+            var fb_token = res.authResponse.accessToken;
+
+            // Get user infos from the API
+            this.fb.api("/me?fields=id,name,first_name,gender,birthday,email", []).then((user) => {
+
+                // Get the connected user details
+                var gender    = user.gender;
+                var birthday  = user.birthday;
+                var name      = user.first_name;
+                var email     = user.email;
+                var id = user.id;
+                var picture   = "https://graph.facebook.com/"+id+"/picture?width=1024&height=1024";
+                
+                this.user.email = email;
+                this.user.username = name;
+                this.user.password = "";
+                this.user.picture = picture;
+                this.http.post('https://smartcafeserver.herokuapp.com/api/auth/register',this.user,{}).then(data=>{
+                  
+                  console.log('Sent the post request');
+                  this.storage.set('User',{id:id,username:this.user.username,password:this.user.password,email:this.user.email,picture:this.user.picture}).then(done=>{
+                    console.log('Saved user in phone storage:'+this.user.username+":"+this.user.password+':'+this.user.email);
+                  });
+                  console.log('Response from server:'+JSON.parse(data.data));
+                  this.navCtrl.setRoot(this.userPage,{username:name,email:email,picture:picture,state:this.state});
+                });
+
+                console.log("=== USER INFOS ===");
+                console.log("Gender : " + gender);
+                console.log("Birthday : " + birthday);
+                console.log("Name : " + name);
+                console.log("Email : " + email);
+
+                // => Open user session and redirect to the next page
+
+            });
+
+        } 
+        // An error occurred while loging-in
+        else {
+
+            console.log("An error occurred...");
+
+        }
+
+    })
+    .catch((e) => {
+        console.log('Error logging into Facebook', e);
+    });
+
+  }
+
   onGuestMode() {
     console.log('HERE AT LAST');
     this.navCtrl.push(this.homePage);
@@ -117,7 +183,7 @@ export class LandingPage implements OnInit {
       dismissOnPageChange: true
     });
     loading.present();
-    this.http.post('http://192.168.1.128:3005/api/auth/login',this.user,{}).then(data=>{
+    this.http.post('https://smartcafeserver.herokuapp.com/api/auth/login',this.user,{}).then(data=>{
       const resp = JSON.parse(data.data);
       this.storage.set('User',{username:this.user.username,password:this.user.password,email:this.user.email}).then(done=>{
         console.log('Saved user in phone storage:'+this.user.username+":"+this.user.password+':'+this.user.email);
@@ -126,12 +192,16 @@ export class LandingPage implements OnInit {
       console.log("Username:"+JSON.stringify(resp));
       // console.log("Data is :"+ JSON.stringify(data.data.user.username)+":"+JSON.stringify(data.data.user.email));
       this.loading = false;
-      this.navCtrl.setRoot(this.userPage,{username:resp.username,email:resp.email});
+      this.navCtrl.setRoot(this.userPage,{username:resp.username,email:resp.email,state:this.state});
     });
   }
 
   onClickRegister(){
     this.registerFlag = !this.registerFlag;
+  }
+
+  onViewConditions(){
+    this.navCtrl.push(ShopStatusPage);
   }
 
   onSignup(form:NgForm) {
@@ -151,14 +221,14 @@ export class LandingPage implements OnInit {
       showBackdrop: true
     });
     loading.present();
-    this.http.post('http://192.168.1.128:3005/api/auth/register',this.user,{}).then(data=>{
+    this.http.post('https://smartcafeserver.herokuapp.com/api/auth/register',this.user,{}).then(data=>{
       toast.present();
       console.log('Sent the post request');
-      this.storage.set('User',{username:this.user.username,password:this.user.password,email:this.user.email}).then(done=>{
+      this.storage.set('User',{username:this.user.username,password:this.user.password,email:this.user.email,picture:this.user.picture}).then(done=>{
         console.log('Saved user in phone storage:'+this.user.username+":"+this.user.password+':'+this.user.email);
       });
       console.log('Response from server:'+JSON.parse(data.data));
-      this.navCtrl.setRoot(this.userPage,{username:form.value.username,email:form.value.email});
+      this.navCtrl.setRoot(this.userPage,{username:form.value.username,email:form.value.email,state:this.state,picture:this.user.picture});
     });
   }
 

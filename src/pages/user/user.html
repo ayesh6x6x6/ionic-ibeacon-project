@@ -1,10 +1,20 @@
 <ion-header>
 
   <ion-toolbar>
-    <ion-title>Welcome {{username}} </ion-title>
+    <ion-title>           
+          <ion-item>
+              Welcome {{username}}
+              <ion-avatar item-end>
+                  <img [src]="picture">
+              </ion-avatar>
+          </ion-item>
+          
+        
+    </ion-title>
     <button ion-button icon-only menuToggle>
       <ion-icon name="menu"></ion-icon>
     </button>
+    
   </ion-toolbar>
 
 </ion-header>
@@ -51,7 +61,7 @@
         </ion-card>
     </ion-col>
     <ion-col>
-        <ion-card>
+        <ion-card (click)="onViewConditions()">
           <img src="https://phanmemhopnhat.vn/wp-content/uploads/2018/01/coffee-shop.jpg">
           <!-- <div class="card-title">Shop Status</div>
           <div class="card-subtitle">Get Comfortable!</div> -->

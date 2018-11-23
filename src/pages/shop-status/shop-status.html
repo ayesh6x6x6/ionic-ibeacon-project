@@ -1,0 +1,32 @@
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>Current Status</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+  <ion-card>
+    <img src="https://d3dygw8n5l4bbu.cloudfront.net/deals/uae/victory_cafe/54817/victory_cafe_3.jpg"/>
+    <ion-card-title>
+        <strong>Available Tables</strong> 
+    </ion-card-title>
+    <ion-list>
+            <div ion-item>
+                <p> Side Tables: {{sidetables_available}} </p>
+            </div>
+             <div ion-item>
+                 <p> Business Tables: {{businesstables_available}} </p>
+             </div>
+    </ion-list>
+   <ion-card-title>
+     Location Info
+   </ion-card-title>
+   <div><p><ion-icon name="thermometer"></ion-icon> Temperature: {{temperature}}</p></div> 
+   <div><p></p><ion-icon name="sunny" ></ion-icon> Lighting and Brightness: {{brightness}}</p> </div>
+    
+   
+  </ion-card>
+</ion-content>
