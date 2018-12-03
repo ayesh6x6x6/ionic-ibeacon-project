@@ -7,6 +7,7 @@ const userSchema = mongoose.Schema({
     password: String,
     favItems: [{ type: mongoose.Schema.Types.ObjectId, ref: 'MenuItem' }],
     orderHistory: [{type: mongoose.Schema.Types.ObjectId, ref: 'Order'}],
+    visit: [],
     preferredZone: [{type:String}],
     r:Number,
     g:Number,

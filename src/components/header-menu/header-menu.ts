@@ -12,7 +12,7 @@ export class HeaderMenuComponent {
   client:Client
 
   constructor(public menuCtrl: MenuController,public app: App,public http:HTTP,public storage:Storage) {
-    this.client = connect('mqtt://192.168.1.128',{port:3000});
+    this.client = connect('mqtt://broker.hivemq.com/mqtt',{port:8000});
   }
 
   logoutClicked() {

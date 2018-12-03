@@ -10,9 +10,9 @@
 <ion-content padding>
   <ion-card>
     <img src="https://d3dygw8n5l4bbu.cloudfront.net/deals/uae/victory_cafe/54817/victory_cafe_3.jpg"/>
-    <ion-card-title>
+    <ion-card-header>
         <strong>Available Tables</strong> 
-    </ion-card-title>
+    </ion-card-header>
     <ion-list>
             <div ion-item>
                 <p> Side Tables: {{sidetables_available}} </p>
@@ -21,11 +21,15 @@
                  <p> Business Tables: {{businesstables_available}} </p>
              </div>
     </ion-list>
-   <ion-card-title>
-     Location Info
-   </ion-card-title>
-   <div><p><ion-icon name="thermometer"></ion-icon> Temperature: {{temperature}}</p></div> 
-   <div><p></p><ion-icon name="sunny" ></ion-icon> Lighting and Brightness: {{brightness}}</p> </div>
+   <ion-card-header>
+     <strong> Location Info </strong>
+   </ion-card-header>
+   <ion-list>
+      <ion-item><p><ion-icon item-start name="thermometer"></ion-icon> Temperature: {{temperature}}</p></ion-item> 
+      <ion-item><p><ion-icon item-start name="sunny" ></ion-icon> Lighting and Brightness: {{brightness}}</p> </ion-item>
+      <ion-item><p><ion-icon item-start name="people" ></ion-icon> Current Crowd Count: {{crowd_count}}</p> </ion-item>
+   </ion-list>
+   
     
    
   </ion-card>

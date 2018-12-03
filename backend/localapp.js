@@ -10,12 +10,151 @@ const User = require('./models/user');
 const app = express();
 const mqtt = require('mqtt');
 const broker = 'mqtt://localhost';
-const axios = require('axios');
+const Machine = require('knearest');
+const KNN = require('ml-knn');
+const kNN = require("k.n.n");
+
+// var data = [ new kNN.Node({paramA: 1, paramB: 300, type: 'typeA'}), 
+//              new kNN.Node({paramA: 3, paramB: 350, type: 'typeA'}), 
+//              new kNN.Node({paramA: 6, paramB: 1200, type: 'typeB'}), 
+//              new kNN.Node({paramA: 8, paramB: 900, type: 'typeB'}), 
+//              new kNN.Node({paramA: 1, paramB: 1220, type: 'typeC'}), 
+//              new kNN.Node({paramA: 2, paramB: 900, type: 'typeC'}) ];
+var data = [ 
+    new kNN.Node({paramA:222222222222555555555555555545,type: 'PS4-Sidetables' }),
+    new kNN.Node({paramA:222222222222225555555555555555,type: 'PS4-Sidetables'}),
+    new kNN.Node({paramA:222222222222555555555555522225,type: 'PS4-Sidetables'}),
+    new kNN.Node({ paramA:111111111444444444444444444444,type: 'Bookshelf-Sidetables' }),
+    new kNN.Node({paramA:111111114444444444444444444444,type: 'Bookshelf-Sidetables' }),
+    new kNN.Node({paramA:111111114444444444444444444111,type: 'Bookshelf-Sidetables' }),
+    new kNN.Node({paramA:222222222222222222222222222222,type:'PS4'}),
+    new kNN.Node({paramA:222222222222222222222222222333,type:'PS4'}),
+    new kNN.Node({paramA:222222224442222222222222227222,type:'PS4'}),
+    new kNN.Node({paramA:444444444444444444444444444444,type:'Sidetables'}),
+    new kNN.Node({paramA:344444444444444444444444444443,type:'Sidetables'}),
+    new kNN.Node({paramA:444444444444444444444444444444,type:'Sidetables'}),
+
+    new kNN.Node({paramA:333333333333333333333333333333,type:'Entrypoint-counter'}),
+    new kNN.Node({paramA:333333333333333333333333333333,type:'Entrypoint-counter'}),
+    new kNN.Node({paramA:333333333333333333333333333333,type:'Entrypoint-counter'}),
+    new kNN.Node({paramA:333333333333333333333333313333,type:'Entrypoint-counter'}),
+
+    new kNN.Node({paramA:666666666666111111111111111111,type:'Business-bookshelf'}),
+    new kNN.Node({paramA:666666666666666111111111111111,type:'Business-bookshelf'}),
+    new kNN.Node({paramA:666666666666666111111111111111,type:'Business-bookshelf'}),
+
+    new kNN.Node({paramA:555555555555555555555533355555,type:'Sidetables'}),
+    new kNN.Node({paramA:555555555555555555555333335125,type:'Sidetables'}),
+    new kNN.Node({paramA:555555555555555555555555555553,type:'Sidetables'}),
+
+    new kNN.Node({paramA: 111111111111111111114111411111,type:'Bookshelf'}),
+    new kNN.Node({paramA:111111111111111111111111111111,type:'Bookshelf'}),
+    new kNN.Node({paramA:111111111111111111111111111111,type:'Bookshelf'}),
+    new kNN.Node({paramA:111111111111111111111111111111,type:'Bookshelf'}),
+       
+    new kNN.Node({paramA:777777777777777777777777777777,type:'Corner'}),
+    new kNN.Node({paramA:777777777777777777777777777777,type:'Corner'}),
+    new kNN.Node({paramA:777777777777777777777777777777,type:'Corner'}),
+
+    new kNN.Node({paramA:666666666666666666666666666666,type:'Business'}),
+    new kNN.Node({paramA:666666666666666666666666666666,type:'Business'}),
+    new kNN.Node({paramA:666666666666666666666666666666,type:'Business'})];
+var example = new kNN(data);
+
+var Color = require('color');
+var color = Color('#7743CE');
+var info = "this is life";
+info.fontcolor = color;
+console.log(info);
 
 var mongodbHost = 'ds259912.mlab.com';
 var mongodbPort = '59912';
 var authenticate = 'shilpa:est123@'; 
 var mongodbDatabase = '490_beacon';
+
+var clusters = {
+    "0":"PS4-Sidetables",
+    "1":"Bookshelf-Sidetables",
+    "2":"PS4",
+    "3":"Sidetables",
+    "4":"Entrypoint-counter",
+    "5":"Business-bookshelf",
+    "6":"Sidetables",
+    "7":"Bookshelf",
+    "8":"Corner",
+    "9":"Business"
+}
+
+// Some data to get us going. It's important that your data is well-clustered,
+// because statistical noise will render this algorithm less useful.
+// let machine= new Machine({                                              // Optional. Defaults to 1.
+//   props: [
+//     {
+//       name: 'visit',
+//       type: String
+//     },
+//     {
+//       name: 'cluster',
+//       type: String
+//     }
+//   ],                   // Required. This is the schema of your dataset. All nodes will be checked against this.
+//   nodes: [                                            // Required. There must be some data to seed the AI's knowledge
+//     {visit: '222222222222', cluster: 'PS4-Sidetables' },
+//     {visit: '555555555555', cluster: 'PS4-Sidetables'},
+//     { visit:'444444444444', cluster: 'Bookshelf-Sidetables' },
+//     {visit: '114444444444', cluster: 'Bookshelf-Sidetables' },
+
+//     // {visit: '222222222222555555555555555545', cluster: 'PS4-Sidetables' },
+//     // {visit:'222222222222225555555555555555', cluster: 'PS4-Sidetables'},
+//     // {visit:'222222222222555555555555522225', cluster: 'PS4-Sidetables'},
+//     // { visit:'111111111444444444444444444444', cluster: 'Bookshelf-Sidetables' },
+//     // {visit:'111111114444444444444444444444', cluster: 'Bookshelf-Sidetables' },
+//     // {visit:'111111114444444444444444444111', cluster: 'Bookshelf-Sidetables' },
+//     // {visit:'222222222222222222222222222222', cluster:'PS4'},
+//     // {visit:'222222222222222222222222222333', cluster:'PS4'},
+//     // {visit:'222222224442222222222222227222',cluster:'PS4'},
+//     // {visit:'444444444444444444444444444444',cluster:'Sidetables'},
+//     // {visit:'344444444444444444444444444443',cluster:'Sidetables'},
+//     // {visit:'444444444444444444444444444444', cluster:'Sidetables'}
+
+//     // {visit:'333333333333333333333333333333',cluster:'Entrypoint-counter'},
+//     // {visit:'333333333333333333333333333333',cluster:'Entrypoint-counter'},
+//     // {visit:'333333333333333333333333333333',cluster:'Entrypoint-counter'},
+//     // {visit:'333333333333333333333333313333',cluster:'Entrypoint-counter'},
+
+//     // {visit:'666666666666111111111111111111',cluster:'Business-bookshelf'},
+//     // {visit:'666666666666666111111111111111',cluster:'Business-bookshelf'},
+//     // {visit:'666666666666666111111111111111',cluster:'Business-bookshelf'},
+
+//     // {visit:'555555555555555555555533355555',cluster:'Sidetables'},
+//     // {visit:'555555555555555555555333335125',cluster:'Sidetables'},
+//     // {visit:'555555555555555555555555555553',cluster:'Sidetables'},
+
+//     // {visit: '111111111111111111114111411111',cluster:'Bookshelf'},
+//     // {visit:'111111111111111111111111111111',cluster:'Bookshelf'},
+//     // {visit:'111111111111111111111111111111',cluster:'Bookshelf'},
+//     // {visit:'111111111111111111111111111111',cluster:'Bookshelf'},
+       
+//     // {visit:'777777777777777777777777777777',cluster:'Corner'},
+//     // {visit:'777777777777777777777777777777',cluster:'Corner'},
+//     // {visit:'777777777777777777777777777777',cluster:'Corner'},
+
+//     // {visit:'666666666666666666666666666666',cluster:'Business'},
+//     // {visit:'666666666666666666666666666666',cluster:'Business'},
+//     // {visit:'666666666666666666666666666666',cluster:'Business'}
+//   ],
+//   verbose: true,                                      // Optional. Toggle console output. Defaults to false
+//   stringAlgorithm: 'Levenshtein'                      // Optional. Defaults to 'Jaro-Winkler'
+// });
+
+ 
+// knearest is also an EventEmitter.
+// The below line will print to terminal each time a node is added.
+ 
+// Let's add a new data point, this time without a "type".
+// We want to guess the value of "type".
+// .guess(property, node) returns a bluebird Promise.
+
 
 // var bookedTables = [];
 var idTable = {
@@ -23,11 +162,22 @@ var idTable = {
      '45700':"88e490df11769a5b",
      '16549':"b19334231ae24c5e"    
  }
+
+zoneInfo = {
+    "38872": "1", //book shelf
+    "45700": "2", //ps4
+    "16549": "3", //pink entrance beacon
+    "58350": "4", //side table beacon
+    "1859" : "5", //side table beacon
+    "35730": "6", //business beacon
+    "3588" : "7"  //shop corner beetroot
+}
 var tableBeacons = {
     '35730':'Business Sofas',
     '1859': 'Side Sofas',
     '58350': 'Side Sofas'
 };
+var startup = true;
 var sidetablebeacons = ['1859','58350'];
 var businessbeacons = ['35730'];
 var userTracker = [];
@@ -35,15 +185,22 @@ var shopTemp = 0;
 var shopLight = 0;
 
 var mqtt_client = mqtt.connect(broker);
+
 var mqtt_client2 = mqtt.connect('mqtt://broker.hivemq.com');
 mqtt_client2.subscribe('/cafe/temperature/38872');
 mqtt_client2.subscribe('/cafe/temperature/45700');
+mqtt_client2.subscribe('cafe/logout/#');
+
+mqtt_client2.on('message',(topic,payload)=>{
+    var loggedoutuser = payload;
+    userTracker = _.remove(userTracker,{user:loggedoutuser});
+});
 
 setInterval(()=>{
     if(userTracker.length > 0){
         userTracker = _.uniq(userTracker);
     }
-    mqtt_client2.publish('cafe/status',JSON.stringify({tables:userTracker,temperature:shopTemp,ambientLight:shopLight}));
+    mqtt_client2.publish('cafe/status',JSON.stringify({tables:userTracker,temperature:shopTemp,crowd_count:userTracker.length ,ambientLight:shopLight}));
     console.log('Published status information');
     console.log(userTracker);
     console.log(shopLight);
@@ -78,8 +235,30 @@ mqtt_client2.on('connect', function () {
           }
         );
 var len = false;
+
 var url = 'mongodb://'+authenticate+mongodbHost+':'+mongodbPort + '/' + mongodbDatabase;
 mongoose.connect(url).then( () => {
+    //behavior track code
+    setInterval(()=>{
+        userTracker.forEach(track=>{
+            if(track.track_count < 30){
+                var toAdd = zoneInfo[track.table];
+                if(toAdd){
+                    track.track_count ++;
+                    track.behavior += toAdd;
+                    console.log('To ADD:'+toAdd);
+                }                
+            } else if(track.visit_done == 0 && track.track_count >= 30) {
+                track.visit_done = 1;
+                User.findOneAndUpdate({username:track.user},{$push: {visit:track.behavior}},(err,r)=>{
+                    if(err){
+                        console.log(err);
+                    }
+                    console.log(r);
+                });
+            }
+        });
+    },30000);
     mqtt_client.on('message', (topic, payload) => {
         console.log(`message from ${topic}: ${payload}`);
         if(topic.substring(0,12)=='cafe/logout/'){
@@ -87,27 +266,45 @@ mongoose.connect(url).then( () => {
             var ind = userTracker.findIndex(track => track.user == name);
             userTracker.splice(ind,1);
         }
-        if(topic.substring(0,11)=='cafe/users/'){
-            var userData = JSON.parse(payload);
-            var user = userData.user;
-            var table = userData.table;
+        if(topic.substring(0,17)=='cafe/usertracker/'){
+                var userData = JSON.parse(payload);
+                var user = userData.user;
+                var table = userData.table;
+    
+                if((userTracker.findIndex(track=>track.user == user))>=0){
+                    console.log('Already there lol;)'); // remove old location and push new location!!
+                    var ind = userTracker.findIndex(track=>track.user==user);
+                    console.log('Found user at index:'+ind);
+                    userTracker[ind].table = table;
+                    console.log('New updated location:'+userTracker[ind]);
+                } else {
+                    userTracker.push({user:user,table:table,track_count:0,behavior:'',visit_done:0});
+                }
+                console.log(userTracker);
 
-            if((userTracker.findIndex(track=>track.user == user))>=0){
-                console.log('Already there lol;)'); // remove old location and push new location!!
-                var ind = userTracker.findIndex(track=>track.user==user);
-                console.log('Found user at index:'+ind);
-                userTracker[ind].table = table;
-                console.log('New updated location:'+userTracker[ind]);
-            } else {
-                userTracker.push({user:user,table:table});
-            }
-            console.log(userTracker);                  
+                  
         }
         if(topic.substring(0,11) == 'cafe/entry/'){
             User.findOne({username:payload},(err,res)=>{
                 if(err){
                     console.log(err);
                 } else {
+                    if(res.visit.length>0){
+                        console.log(res.visit[res.visit.length - 1]);
+                        var ress = example.launch(1, new kNN.Node({paramA:Number(res.visit[res.visit.length-1]),type:false}));
+
+                        console.log(ress.type + ": "+ress.percentage+"%");
+
+                        // machine.on('guessing', () => console.log('Guessing zzzzzzzzzzzzzzzzzzzzzzzzzz') );
+
+                        // machine.guess('cluster', {visit:'444424444444'}).then((result) => {
+                        //     console.log('Value of "' + result.feature + '" is probably ' + result.value);
+                        //     mqtt_client.publish(`cafe/specials/${res.username}`,'You are special in cluster'+result.value);
+                        // });   
+                        mqtt_client.publish(`cafe/specials/${res.username}`,'You are special in cluster'+ress.type);
+ 
+                        // Machine.on('guess', ({ elapsed: Number, feature: String, value: String }) => console.log('Guessed'+value) );
+                    }
                     console.log('New user:'+res);
                     // console.log('New users color:'+res["color"]);
                     var zones = _.uniq(res.preferredZone);
@@ -136,11 +333,15 @@ mongoose.connect(url).then( () => {
                                             if(!_.find(userTracker,{table:beacon})){
                                                 console.log('FINSALLYY');
                                                 tosend = beacon;
+                                                first_or_second = true;
                                                 console.log('Found table:'+tosend);
                                             }
                                         });
                                     }
                                 }
+                            }
+                            if(!first_or_second){
+                                tosend = "AllBusy";
                             }
                         } else {
                             tosend = sidetablebeacons[0];
@@ -148,11 +349,40 @@ mongoose.connect(url).then( () => {
                         
 
                     } else if (zone == "Business Sofas"){
-                        // businessbeacons.forEach((beacon)=>{
-                        //     if(!bookedTables.indexOf(beacon)>=0){
-                        //         tosend = beacon;
-                        //     }
-                        // });
+                        if(userTracker.length > 0){
+                            console.log(userTracker);
+                            var first_or_second = false;
+                            businessbeacons.forEach((beacon)=>{
+                                console.log('Beacon:'+beacon);
+                                if(!_.find(userTracker,{table:beacon})){
+                                    console.log('FINSALLYY');
+                                    tosend = beacon;
+                                    console.log('Found table:'+tosend);
+                                    first_or_second = true;
+                                }
+                            });
+                            if(!first_or_second){
+                                if(zones.length > 1) {
+                                    zone = zones[1];
+                                    if(zone == "Side Sofas"){
+                                        sidetablebeacons.forEach((beacon)=>{
+                                            console.log('Beacon:'+beacon);
+                                            if(!_.find(userTracker,{table:beacon})){
+                                                console.log('FINSALLYY');
+                                                tosend = beacon;
+                                                first_or_second = true;
+                                                console.log('Found table:'+tosend);
+                                            }
+                                        });
+                                    }
+                                }
+                            }
+                            if(!first_or_second){
+                                tosend = "AllBusy";
+                            }
+                        } else {
+                            tosend = sidetablebeacons[0];
+                        }
                     }
                     // console.log('Booked beacons:'+bookedTables);
                     // var colors = JSON.parse(res.color);
@@ -190,10 +420,14 @@ mongoose.connect(url).then( () => {
             });
         }
     }); 
+
     mqtt_client.subscribe('cafe/favtable/#');
     mqtt_client.subscribe('cafe/entry/#');
     mqtt_client.subscribe('cafe/booktable');
-    mqtt_client.subscribe('cafe/users/#');
+    mqtt_client.subscribe('cafe/usertracker/#');
+    // mqtt_client.publish('cafe/users/',0);
+    // mqtt_client.publish('cafe/users/#',0);
+    // mqtt_client.publish('cafe/users/Ayesh',0);
     mqtt_client.subscribe('cafe/logout/#');
 });
     

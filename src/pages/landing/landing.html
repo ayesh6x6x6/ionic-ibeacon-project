@@ -65,8 +65,8 @@
     </ion-list>
     <button ion-button block type="submit" [disabled]="!f.valid" >Sign In</button>
   </form>
-  <button ion-button block (click)="onFb()" > <ion-icon name="logo-facebook" ></ion-icon> Log In With Facebook</button>
-  <button ion-button round block (click)="onClickRegister()" >Dont have an account? Click to register!</button>
+  <button ion-button block (click)="onFb()" > <ion-icon item-start name="logo-facebook" ></ion-icon>Log In With Facebook</button>
+  <button ion-button round (click)="onClickRegister()" >Dont have an account? Click to register!</button>
     
   </div>
 

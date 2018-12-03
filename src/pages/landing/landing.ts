@@ -24,7 +24,7 @@ export class LandingPage implements OnInit {
     email: '',
     username: '',
     password: '',
-    picture: 'https://at-cdn-s01.audiotool.com/2013/05/11/users/guess_audiotool/avatar256x256-709d163bfa4a4ebdb25160d094551c33.jpg'
+    picture: '../../assets/imgs/dp.jpg'
   }; 
   zone:any;
   state:string = '';
@@ -185,14 +185,14 @@ export class LandingPage implements OnInit {
     loading.present();
     this.http.post('https://smartcafeserver.herokuapp.com/api/auth/login',this.user,{}).then(data=>{
       const resp = JSON.parse(data.data);
-      this.storage.set('User',{username:this.user.username,password:this.user.password,email:this.user.email}).then(done=>{
+      this.storage.set('User',{username:resp.username,password:this.user.password,email:this.user.email,picture:this.user.picture}).then(done=>{
         console.log('Saved user in phone storage:'+this.user.username+":"+this.user.password+':'+this.user.email);
       });
       console.log('Response from the server:'+resp.username);
       console.log("Username:"+JSON.stringify(resp));
       // console.log("Data is :"+ JSON.stringify(data.data.user.username)+":"+JSON.stringify(data.data.user.email));
       this.loading = false;
-      this.navCtrl.setRoot(this.userPage,{username:resp.username,email:resp.email,state:this.state});
+      this.navCtrl.setRoot(this.userPage,{username:resp.username,email:resp.email,state:this.state,picture:this.user.picture});
     });
   }
 

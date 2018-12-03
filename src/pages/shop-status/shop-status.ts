@@ -11,6 +11,7 @@ export class ShopStatusPage {
   userTracker = [];
   temperature = 0;
   brightness = 0;
+  crowd_count = 0;
   sidetablebeacons = ['1859','58350'];
   businessbeacons = ['35730'];
   sidetables_available = 2;
@@ -27,6 +28,7 @@ export class ShopStatusPage {
         this.businesstables_available = 1;
         this.sidetables_available = 2;
         this.userTracker = info.tables;
+        this.crowd_count = info.crowd_count;
         this.temperature = info.temperature;
         this.brightness = info.ambientLight;
         this.sidetablebeacons.forEach(beacon=>{

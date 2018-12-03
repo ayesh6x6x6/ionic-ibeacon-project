@@ -15,17 +15,26 @@
             </button>
         </ion-buttons>
         
+        
     </ion-toolbar>
 
 </ion-header>
 
 
-<ion-content padding>
-    <ion-grid no-padding fixed>
-      <ion-row *ngFor="let item of menuItems" >
+<ion-content [ngSwitch]="type" padding>
+    <ion-segment [(ngModel)]="type" color="secondary">
+        <ion-segment-button value="hot">
+          Hot Drinks
+        </ion-segment-button>
+        <ion-segment-button value="cold">
+          Cold Drinks
+        </ion-segment-button>
+      </ion-segment>
+    <ion-grid *ngSwitchCase="'hot'" no-padding fixed>
+      <ion-row *ngFor="let item of hotmenuItems" >
         <ion-col>
           <ion-card>
-            <img src="{{item.img}}">
+            <img [src]="item.img">
             <ion-card-content>
               <ion-card-title>
                 {{item.name}}
@@ -43,7 +52,7 @@
                 </button>
               </ion-col>
               <ion-col col-7>
-                <button ion-button icon-start clear small >
+                <button (click)="addToFav(item)" ion-button icon-start clear small >
                   <ion-icon name="star" ></ion-icon>
                   Add To Favorites
                 </button>
@@ -53,4 +62,37 @@
         </ion-col>
       </ion-row>
     </ion-grid>
+
+    <ion-grid *ngSwitchCase="'cold'" no-padding fixed>
+        <ion-row *ngFor="let item of coldmenuItems" >
+          <ion-col>
+            <ion-card>
+              <img [src]="item.img">
+              <ion-card-content>
+                <ion-card-title>
+                  {{item.name}}
+                </ion-card-title>
+                <p>{{item.description}}</p>
+                <div>
+                    AED {{item.price}}
+                </div>
+              </ion-card-content>
+              <ion-row>
+                <ion-col col-5>
+                  <button (click)="addToCart(item)" ion-button icon-start clear small >
+                    <ion-icon name="cart" ></ion-icon>
+                    Add To Cart
+                  </button>
+                </ion-col>
+                <ion-col col-7>
+                  <button (click)="addToFav(item)" ion-button icon-start clear small >
+                    <ion-icon name="star" ></ion-icon>
+                    Add To Favorites
+                  </button>
+                </ion-col>
+              </ion-row>
+            </ion-card>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
 </ion-content>

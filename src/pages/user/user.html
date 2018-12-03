@@ -1,22 +1,17 @@
 <ion-header>
-
   <ion-toolbar>
-    <ion-title>           
-          <ion-item>
-              Welcome {{username}}
-              <ion-avatar item-end>
-                  <img [src]="picture">
-              </ion-avatar>
-          </ion-item>
-          
-        
-    </ion-title>
-    <button ion-button icon-only menuToggle>
-      <ion-icon name="menu"></ion-icon>
-    </button>
-    
+    <ion-title>     
+      <ion-item clear color="primary">
+        Welcome {{username}}
+        <ion-avatar item-end>
+          <img [src]="picture">
+        </ion-avatar>
+      </ion-item>         
+  </ion-title>
+  <button ion-button icon-only menuToggle>
+    <ion-icon name="menu"></ion-icon>
+  </button>  
   </ion-toolbar>
-
 </ion-header>
 
 
@@ -50,7 +45,7 @@
   <ion-row>
     <ion-col>
         <ion-card (click)="onOrder()">
-            <img src="http://keynotesbh.com/wp-content/uploads/2016/02/coffee_shop_design-sized.jpg"/>
+            <img src="https://thenypost.files.wordpress.com/2018/03/180310-coffee-shop-wont-serve-cops.jpg?quality=90&strip=all&w=618&h=410&crop=1"/>
             <!-- <div class="card-title">Place Order</div>
             <div class="card-subtitle">You know you want to!</div> -->
             <ion-card-content>
@@ -63,8 +58,6 @@
     <ion-col>
         <ion-card (click)="onViewConditions()">
           <img src="https://phanmemhopnhat.vn/wp-content/uploads/2018/01/coffee-shop.jpg">
-          <!-- <div class="card-title">Shop Status</div>
-          <div class="card-subtitle">Get Comfortable!</div> -->
           <ion-card-content>
               <ion-card-title>
                 Shop Status
@@ -97,15 +90,6 @@
       </ion-card>
     </ion-col>
   </ion-row>
-  <!-- <ion-list no-lines>
-    <ion-row>
-        
-    </ion-row>
-    <ion-row>
-        
-    </ion-row>      
-      
-      
-  </ion-list> -->
+
 </ion-grid>
 </ion-content>
