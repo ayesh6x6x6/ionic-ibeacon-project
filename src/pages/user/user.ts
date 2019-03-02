@@ -11,6 +11,7 @@ import { connect, Client, IConnackPacket,IClientPublishOptions } from 'mqtt';
 import { ShopStatusPage } from '../shop-status/shop-status';
 import Color from 'color';
 import { LocalNotifications } from '@ionic-native/local-notifications';
+import { Storage } from '@ionic/storage';
 import { rgb } from 'color-convert/conversions';
 
 @Component({
@@ -48,7 +49,7 @@ export class UserPage implements OnInit {
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public beaconProvider:BeaconProvider,
               public events: Events,private http: HTTP,private ibeacon: IBeacon,public localNotifications: LocalNotifications,
-              private alertCtrl: AlertController) {
+              private alertCtrl: AlertController, private storage: Storage) {
       this.zone = new NgZone({ enableLongStackTrace: false });
       this.subTitle = this.subTitle.fontcolor(this.color.hex());
       this.subTitle
@@ -61,10 +62,10 @@ export class UserPage implements OnInit {
       
 
       this.client.on('message', (topic: string, payload: string) => {
-        if(topic.substring(0,13)=='cafe/specials'){
-          console.log('Got specials');
+        if(topic.substring(0,11)=="cafe/offers"){
+          console.log('Reached offers condition');
           const alert = this.alertCtrl.create({
-            title:"You are identified",
+            title:"You are eligible for a new offer!",
             subTitle:payload,
             buttons:[              
               {
@@ -73,6 +74,21 @@ export class UserPage implements OnInit {
             ]
           });
           alert.present();
+        }
+        if(topic.substring(0,13)=='cafe/specials'){
+          this.client.subscribe('cafe/offers/'+payload);
+          console.log('Received specials condition');
+          // console.log('Got specials');
+          // const alert = this.alertCtrl.create({
+          //   title:"You are identified",
+          //   subTitle:payload,
+          //   buttons:[              
+          //     {
+          //       text:'Ok'
+          //     }
+          //   ]
+          // });
+          // alert.present();
           // this.localNotifications.schedule({
           //   id: 1,
           //   title:'SmartCafe',
@@ -104,11 +120,17 @@ export class UserPage implements OnInit {
             var b = info.b;
             if(r == 255) {
               r = 0;
+              g = 255 - g;
+              b = 255 - b;
             }
             if(g == 255){
               g = 0;
+              r = 255 - r;
+              b = 255 - b;
             }
             if(b == 255){
+              r = 255 - r;
+              g = 255 - g;
               b = 0;
             }
             var mess = "Look out for this color lamp!";

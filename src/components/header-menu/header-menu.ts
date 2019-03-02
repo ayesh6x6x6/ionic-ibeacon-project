@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
 import { Storage } from '@ionic/storage';
-import { MenuController, App } from 'ionic-angular';
+import { MenuController, App, NavController } from 'ionic-angular';
 import { LandingPage } from '../../pages/landing/landing';
 import { HTTP } from '@ionic-native/http';
 import { connect, Client, IConnackPacket } from 'mqtt';
+import { OffersPage } from '../../pages/offers/offers';
 @Component({
   selector: 'header-menu',
   templateUrl: 'header-menu.html'
@@ -28,6 +29,11 @@ export class HeaderMenuComponent {
       nav.setRoot(LandingPage);
     });
     
+  }
+
+  onViewOffers(){
+    var nav = this.app.getRootNav();
+    nav.push(OffersPage);
   }
 
 }

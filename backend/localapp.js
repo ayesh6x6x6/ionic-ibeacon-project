@@ -85,78 +85,6 @@ var clusters = {
     "9":"Business"
 }
 
-// Some data to get us going. It's important that your data is well-clustered,
-// because statistical noise will render this algorithm less useful.
-// let machine= new Machine({                                              // Optional. Defaults to 1.
-//   props: [
-//     {
-//       name: 'visit',
-//       type: String
-//     },
-//     {
-//       name: 'cluster',
-//       type: String
-//     }
-//   ],                   // Required. This is the schema of your dataset. All nodes will be checked against this.
-//   nodes: [                                            // Required. There must be some data to seed the AI's knowledge
-//     {visit: '222222222222', cluster: 'PS4-Sidetables' },
-//     {visit: '555555555555', cluster: 'PS4-Sidetables'},
-//     { visit:'444444444444', cluster: 'Bookshelf-Sidetables' },
-//     {visit: '114444444444', cluster: 'Bookshelf-Sidetables' },
-
-//     // {visit: '222222222222555555555555555545', cluster: 'PS4-Sidetables' },
-//     // {visit:'222222222222225555555555555555', cluster: 'PS4-Sidetables'},
-//     // {visit:'222222222222555555555555522225', cluster: 'PS4-Sidetables'},
-//     // { visit:'111111111444444444444444444444', cluster: 'Bookshelf-Sidetables' },
-//     // {visit:'111111114444444444444444444444', cluster: 'Bookshelf-Sidetables' },
-//     // {visit:'111111114444444444444444444111', cluster: 'Bookshelf-Sidetables' },
-//     // {visit:'222222222222222222222222222222', cluster:'PS4'},
-//     // {visit:'222222222222222222222222222333', cluster:'PS4'},
-//     // {visit:'222222224442222222222222227222',cluster:'PS4'},
-//     // {visit:'444444444444444444444444444444',cluster:'Sidetables'},
-//     // {visit:'344444444444444444444444444443',cluster:'Sidetables'},
-//     // {visit:'444444444444444444444444444444', cluster:'Sidetables'}
-
-//     // {visit:'333333333333333333333333333333',cluster:'Entrypoint-counter'},
-//     // {visit:'333333333333333333333333333333',cluster:'Entrypoint-counter'},
-//     // {visit:'333333333333333333333333333333',cluster:'Entrypoint-counter'},
-//     // {visit:'333333333333333333333333313333',cluster:'Entrypoint-counter'},
-
-//     // {visit:'666666666666111111111111111111',cluster:'Business-bookshelf'},
-//     // {visit:'666666666666666111111111111111',cluster:'Business-bookshelf'},
-//     // {visit:'666666666666666111111111111111',cluster:'Business-bookshelf'},
-
-//     // {visit:'555555555555555555555533355555',cluster:'Sidetables'},
-//     // {visit:'555555555555555555555333335125',cluster:'Sidetables'},
-//     // {visit:'555555555555555555555555555553',cluster:'Sidetables'},
-
-//     // {visit: '111111111111111111114111411111',cluster:'Bookshelf'},
-//     // {visit:'111111111111111111111111111111',cluster:'Bookshelf'},
-//     // {visit:'111111111111111111111111111111',cluster:'Bookshelf'},
-//     // {visit:'111111111111111111111111111111',cluster:'Bookshelf'},
-       
-//     // {visit:'777777777777777777777777777777',cluster:'Corner'},
-//     // {visit:'777777777777777777777777777777',cluster:'Corner'},
-//     // {visit:'777777777777777777777777777777',cluster:'Corner'},
-
-//     // {visit:'666666666666666666666666666666',cluster:'Business'},
-//     // {visit:'666666666666666666666666666666',cluster:'Business'},
-//     // {visit:'666666666666666666666666666666',cluster:'Business'}
-//   ],
-//   verbose: true,                                      // Optional. Toggle console output. Defaults to false
-//   stringAlgorithm: 'Levenshtein'                      // Optional. Defaults to 'Jaro-Winkler'
-// });
-
- 
-// knearest is also an EventEmitter.
-// The below line will print to terminal each time a node is added.
- 
-// Let's add a new data point, this time without a "type".
-// We want to guess the value of "type".
-// .guess(property, node) returns a bluebird Promise.
-
-
-// var bookedTables = [];
 var idTable = {
      '38872':"39f774e86fece799",
      '45700':"88e490df11769a5b",
@@ -295,13 +223,7 @@ mongoose.connect(url).then( () => {
 
                         console.log(ress.type + ": "+ress.percentage+"%");
 
-                        // machine.on('guessing', () => console.log('Guessing zzzzzzzzzzzzzzzzzzzzzzzzzz') );
-
-                        // machine.guess('cluster', {visit:'444424444444'}).then((result) => {
-                        //     console.log('Value of "' + result.feature + '" is probably ' + result.value);
-                        //     mqtt_client.publish(`cafe/specials/${res.username}`,'You are special in cluster'+result.value);
-                        // });   
-                        mqtt_client.publish(`cafe/specials/${res.username}`,'You are special in cluster'+ress.type);
+                        mqtt_client.publish(`cafe/specials/${res.username}`,ress.type);
  
                         // Machine.on('guess', ({ elapsed: Number, feature: String, value: String }) => console.log('Guessed'+value) );
                     }
@@ -381,7 +303,7 @@ mongoose.connect(url).then( () => {
                                 tosend = "AllBusy";
                             }
                         } else {
-                            tosend = sidetablebeacons[0];
+                            tosend = businessbeacons[0];
                         }
                     }
                     // console.log('Booked beacons:'+bookedTables);
